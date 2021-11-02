@@ -2,10 +2,12 @@
   <v-container fill-height fluid>
     <v-row align="center" justify="center">
       <v-col md="12" lg="4">
-        <v-card elevation="10" outlined class="px-10 py-10">
-          <v-card-title>Vstupit do aplikace</v-card-title>
+        <v-card elevation="10" outlined class="px-sm-10 py-sm-10">
+          <v-card-title>Zápis do aplikace</v-card-title>
           <v-card-text>
             <v-form>
+              <v-text-field label="Křestní jméno" color="secondary"/>
+              <v-text-field label="Příjmení" color="secondary"/>
               <v-text-field label="Uživatelské jméno" color="secondary"/>
               <v-text-field
                   :type="showPassword? 'text': 'password'"
@@ -25,7 +27,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn text class="orange--text">
-              Přihlásit se
+              Registrovat se
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -36,7 +38,7 @@
 
 <script>
 export default {
-  name: "Login",
+  name: "Register",
   data() {
     return {
       showPassword: false,
