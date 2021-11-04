@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <top-bar/>
+    <top-bar v-if="this.$tokenManager.isUserLogged()"/>
 
     <v-main>
       <router-view/>
@@ -11,6 +11,7 @@
 <script>
 
 import TopBar from "./components/TopBar";
+
 export default {
   name: 'App',
   components: {TopBar},

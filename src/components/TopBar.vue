@@ -60,7 +60,7 @@ export default {
     drawer: false,
     group: null,
     menuItems: [
-      {title: 'Hledat doučování', to: 'login', icon: 'mdi-account-search'},
+      {title: 'Hledat doučování', to: 'offers', icon: 'mdi-account-search'},
       {title: 'Nová nabídka', to: 'register', icon: 'mdi-note-plus-outline'},
     ]
   }),

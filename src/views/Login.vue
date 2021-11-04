@@ -6,25 +6,32 @@
           <v-card-title>Vstupit do aplikace</v-card-title>
           <v-card-text>
             <v-form>
-              <v-text-field label="Uživatelské jméno" color="secondary"/>
               <v-text-field
+                  v-model="userName"
+                  label="Uživatelské jméno"
+                  color="secondary"
+                  @click="resetError"
+              />
+              <v-text-field
+                  v-model="password"
                   :type="showPassword? 'text': 'password'"
                   label="Heslo"
                   color="secondary"
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   @click:append="showPassword = !showPassword"
-              />
-              <v-text-field
-                  :type="showRepPassword? 'text': 'password'"
-                  label="Zopakovat heslo"
-                  color="secondary"
-                  :append-icon="showRepPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  @click:append="showRepPassword = !showRepPassword"
+                  @click="resetError"
               />
             </v-form>
+            <v-alert
+                v-if="error"
+                dense
+                outlined
+                type="error">
+              Špatné přihlašovací údaje
+            </v-alert>
           </v-card-text>
           <v-card-actions>
-            <v-btn text class="orange--text">
+            <v-btn text class="orange--text" type="submit" @click="doLogin">
               Přihlásit se
             </v-btn>
           </v-card-actions>
@@ -39,8 +46,29 @@ export default {
   name: "Login",
   data() {
     return {
+      userName: "",
+      password: "",
       showPassword: false,
-      showRepPassword: false
+      error: null
+    }
+  },
+  methods: {
+    async doLogin() {
+      this.resetError()
+      try {
+        const response = await this.$http.post("/login", {userName: this.userName, password: this.password})
+        this.$tokenManager.setToken(response.data.token)
+        await this.$router.push({name: "offers"})
+      } catch (e) {
+        if (e.response.statusCode === 401) {
+          this.error = "Špatné přihlašovací údaje"
+        } else {
+          this.error = e.response.data.error
+        }
+      }
+    },
+    resetError() {
+      this.error = null
     }
   }
 }
