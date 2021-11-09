@@ -1,0 +1,3 @@
+.no-background-on-click::before {
+    background-color: transparent !important;
+}

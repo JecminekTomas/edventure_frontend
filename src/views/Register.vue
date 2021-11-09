@@ -2,34 +2,62 @@
   <v-container fill-height fluid>
     <v-row align="center" justify="center">
       <v-col md="12" lg="4">
-        <v-card elevation="10" outlined class="px-sm-10 py-sm-10">
-          <v-card-title>Zápis do aplikace</v-card-title>
-          <v-card-text>
-            <v-form>
-              <v-text-field label="Křestní jméno" color="secondary"/>
-              <v-text-field label="Příjmení" color="secondary"/>
-              <v-text-field label="Uživatelské jméno" color="secondary"/>
+        <v-card elevation="10" outlined class="px-10 py-10">
+          <v-card-title>Zapsat se do aplikace</v-card-title>
+          <v-form @submit.prevent="doRegister">
+            <v-card-text>
               <v-text-field
-                  :type="showPassword? 'text': 'password'"
+                  v-model="firstName"
+                  label="Křestní jméno"
+                  :error-messages="firstNameErrors"
+                  color="secondary"
+                  @blur="$v.firstName.$touch()"
+              />
+              <v-text-field
+                  v-model="lastName"
+                  label="Příjmení"
+                  :error-messages="lastNameErrors"
+                  color="secondary"
+                  @blur="$v.lastName.$touch()"
+              />
+              <v-text-field
+                  v-model="userName"
+                  label="Uživatelské jméno"
+                  :error-messages="userNameErrors"
+                  color="secondary"
+                  @blur="$v.userName.$touch()"
+              />
+              <v-text-field
+                  v-model="password"
                   label="Heslo"
+                  :error-messages="passwordErrors"
+                  :type="showPassword? 'text': 'password'"
                   color="secondary"
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   @click:append="showPassword = !showPassword"
+                  @blur="$v.password.$touch()"
+                  :counter="32"
               />
               <v-text-field
-                  :type="showRepPassword? 'text': 'password'"
+                  v-model="repPassword"
                   label="Zopakovat heslo"
+                  :error-messages="repPasswordErrors"
+                  :type="showRepPassword? 'text': 'password'"
                   color="secondary"
                   :append-icon="showRepPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   @click:append="showRepPassword = !showRepPassword"
+                  @blur="$v.repPassword.$touch()"
               />
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn text class="orange--text">
-              Registrovat se
+            </v-card-text>
+            <v-btn text plain class="text-caption" :ripple="false" :to="{name: 'login'}">
+              Již máte účet?
             </v-btn>
-          </v-card-actions>
+            <v-card-actions>
+              <v-btn text class="secondary--text" type="submit">
+                Zaregistrovat se
+              </v-btn>
+            </v-card-actions>
+          </v-form>
         </v-card>
       </v-col>
     </v-row>
@@ -37,12 +65,127 @@
 </template>
 
 <script>
+import {validationMixin} from 'vuelidate'
+import {required, minLength, sameAs, maxLength} from 'vuelidate/lib/validators'
+
 export default {
   name: "Register",
+
+  mixins: [validationMixin],
+
+  validations: {
+    firstName: {required, minLength: minLength(2)},
+    lastName: {required, minLength: minLength(2)},
+    userName: {required, minLength: minLength(6), maxLength: maxLength(50)},
+    password: {
+      required, minLength: minLength(8), maxLength: maxLength(32),
+      containsUppercase: function (value) {
+        return /[A-Z]/.test(value)
+      },
+      containsLowercase: function (value) {
+        return /[a-z]/.test(value)
+      },
+      containsNumber: function (value) {
+        return /[0-9]/.test(value)
+      },
+      containsSpecial: function (value) {
+        return /[#?!@$%^&*-]/.test(value)
+      }
+    },
+    repPassword: {required, sameAsPassword: sameAs('password')},
+  },
+
   data() {
     return {
       showPassword: false,
-      showRepPassword: false
+      showRepPassword: false,
+      userName: "",
+      firstName: "",
+      lastName: "",
+      password: "",
+      repPassword: "",
+    }
+  }
+  ,
+
+  methods: {
+
+    async doRegister() {
+      this.$v.$reset()
+      try {
+        await this.$http.post("/register", {
+          firstName: this.firstName,
+          lastName: this.lastName,
+          userName: this.userName,
+          password: this.password
+        })
+        await this.$router.push({name: "login"})
+      } catch (e) {
+        this.error = e.response.data.error
+      }
+    },
+  },
+
+  computed: {
+    userNameErrors() {
+      const errors = []
+      if (!this.$v.userName.$dirty)
+        return errors
+
+      !this.$v.userName.required && errors.push('*Povinné pole')
+      !this.$v.userName.minLength && errors.push('Minimálně 6 znaků')
+      !this.$v.userName.maxLength && errors.push('Maximálně 50 znaků')
+
+      return errors
+    }
+    ,
+    passwordErrors() {
+      const errors = []
+      if (!this.$v.password.$dirty)
+        return errors
+
+      !this.$v.password.required && errors.push('*Povinné pole')
+      !this.$v.password.minLength && errors.push('Minimálně 8 znaků')
+      !this.$v.password.maxLength && errors.push('Maximálně 32 znaků')
+      !this.$v.password.containsLowercase && errors.push('Heslo musí obsahovat malé písmeno')
+      !this.$v.password.containsUppercase && errors.push('Heslo musí obsahovat velké písmeno')
+      !this.$v.password.containsNumber && errors.push('Heslo musí obsahovat číslo')
+      !this.$v.password.containsSpecial && errors.push('Heslo musí obsahovat speciální znak')
+
+      return errors
+    },
+
+    repPasswordErrors() {
+      const errors = []
+      if (!this.$v.repPassword.$dirty)
+        return errors
+
+      !this.$v.repPassword.required && errors.push('*Povinné pole')
+      !this.$v.repPassword.sameAsPassword && errors.push('Hesla se musí shodovat')
+
+      return errors
+    },
+
+    firstNameErrors() {
+      const errors = []
+      if (!this.$v.firstName.$dirty)
+        return errors
+
+      !this.$v.firstName.required && errors.push('*Povinné pole')
+      !this.$v.firstName.minLength && errors.push('Minimálně 2 znaky')
+
+      return errors
+    },
+
+    lastNameErrors() {
+      const errors = []
+      if (!this.$v.lastName.$dirty)
+        return errors
+
+      !this.$v.lastName.required && errors.push('*Povinné pole')
+      !this.$v.lastName.minLength && errors.push('Minimálně 2 znaky')
+
+      return errors
     }
   }
 }

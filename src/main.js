@@ -5,6 +5,7 @@ import store from './store';
 import vuetify from './plugins/vuetify';
 import axiosInstance from "./helpers/http";
 import TokenManager from "./helpers/token-manager"
+import "./assets/global.css"
 
 Vue.config.productionTip = false;
 

@@ -1,7 +1,6 @@
 <template>
   <v-app>
     <top-bar v-if="this.$tokenManager.isUserLogged()"/>
-
     <v-main>
       <router-view/>
     </v-main>
@@ -20,3 +19,7 @@ export default {
   }),
 };
 </script>
+
+<style>
+
+</style>
