@@ -1,37 +1,19 @@
 <template>
-  <v-container fluid>
-    <v-row>
+  <v-container :fill-height="!didLoadOffers" fluid>
+    <v-row align="center" justify="center" v-if="!didLoadOffers">
+      <v-progress-circular indeterminate size="100" color="secondary"/>
+    </v-row>
+    <v-row v-else>
       <v-fade-transition>
-        <v-col md="2" cols="12" v-if="showFilter">
+        <v-col md="3" cols="12" v-if="this.showFilter">
           <filter-drawer/>
         </v-col>
       </v-fade-transition>
       <v-col>
         <v-container>
-          <v-row class="mx-1">
-            <v-col cols="12" md="3">
-              <v-autocomplete label="Univerzita"/>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-autocomplete label="Fakulta"/>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-autocomplete label="Předmět"/>
-            </v-col>
-            <v-col align-self="center" cols="10" md="2">
-              <v-btn color="secondary" block>
-                <v-icon>mdi-magnify</v-icon>
-                Vyhledat
-              </v-btn>
-            </v-col>
-            <v-col align-self="center" cols="2" md="1">
-              <v-btn color="primary" block @click="switchFilter">
-                <v-icon>mdi-filter</v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
-          <v-row justify="start">
-            <template v-for="offer in offers">
+          <search-bar/>
+          <v-row>
+            <template v-for="offer in this.offers">
               <v-col cols="12" md="6" :key="offer.id">
                 <v-hover v-slot="{ hover }">
                   <v-card class="pb-4"
@@ -103,30 +85,28 @@
 
 <script>
 import FilterDrawer from "../components/FilterDrawer";
+import {mapState, mapActions} from 'vuex';
+import SearchBar from "../components/SearchBar";
+
 export default {
   name: "Offers",
-  components: {FilterDrawer},
-  data() {
-    return {
-      offers: [],
-      showFilter: false,
-    }
-  },
+  components: {SearchBar, FilterDrawer},
+
   methods: {
-    switchFilter() {
-      this.showFilter = !this.showFilter
-    },
+    ...mapActions('Offers', ['fetchOffers']),
   },
-  async created() {
-    const response = await this.$http.get('/offers');
-    this.offers = response.data;
+  computed: {
+    ...mapState('Offers', ['offers', 'didLoadOffers', 'showFilter'])
   },
   filters: {
     shorten(text) {
       if (!text || text.length <= 255) return text;
       return text.substring(0, 255 - 3) + '...';
     }
-  }
+  },
+  async created() {
+    await this.fetchOffers()
+  },
 }
 </script>
 
