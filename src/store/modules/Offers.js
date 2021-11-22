@@ -82,7 +82,6 @@ const actions = {
 
     async fetchSingleOffer({commit}, id) {
         commit('startedDataDownload');
-        console.log('in')
         const response = await this._vm.$http.get(`/offers/${id}`);
         commit('setSingleOffer', response.data);
         commit('finishedDataDownload');

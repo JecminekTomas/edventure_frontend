@@ -23,7 +23,7 @@
         </v-btn>
       </v-toolbar-items>
       <v-toolbar-title class="font-weight-medium mr-2 hidden-md-and-down">
-        Jméno Uživatele
+        {{ fullName }}
       </v-toolbar-title>
     </v-app-bar>
 
@@ -40,7 +40,7 @@
               <v-icon>mdi-account</v-icon>
             </v-list-item-icon>
             <v-list-item-title>
-              Jméno Uživatel
+              {{ fullName }}
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
@@ -71,6 +71,12 @@ export default {
       {title: 'Nová nabídka', to: 'newOffer', icon: 'mdi-note-plus-outline'},
     ]
   }),
+  computed: {
+    fullName() {
+      const fullName = this.$tokenManager.getUserFullName()
+      return `${fullName.lastName} ${fullName.firstName}`
+    }
+  },
 
   watch: {
     group() {

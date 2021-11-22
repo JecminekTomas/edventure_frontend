@@ -120,19 +120,22 @@
                           <v-btn icon
                                  class="no-background-on-click"
                                  :ripple="false"
-                                 :color="getHelpfulColor(true, review)"
+                                 :color="getThumbColor(true, review)"
+                                 :disabled="isThumbDisabled(review)"
                                  @click="sendHelpful(true, review)">
                             <v-icon>mdi-thumb-up-outline</v-icon>
-                            {{ `Užitečné (${review['score']['helpful']})` }}
+                            {{ `Užitečné (${getThumbUpCount(true, review)})` }}
                           </v-btn>
                         </v-col>
                         <v-col cols="12" md="6" class="d-flex justify-center">
                           <v-btn icon
                                  class="no-background-on-click"
                                  :ripple="false"
-                                 :color="getHelpfulColor(false, review)">
+                                 :color="getThumbColor(false, review)"
+                                 :disabled="isThumbDisabled(review)"
+                                 @click="sendHelpful(false, review)">
                             <v-icon>mdi-thumb-down-outline</v-icon>
-                            {{ `Neužitečné (${review['score']['unhelpful']})` }}
+                            {{ `Neužitečné (${review['scoreBalance']['unhelpfulCount']})` }}
                           </v-btn>
                         </v-col>
                       </v-row>
@@ -149,7 +152,7 @@
 </template>
 
 <script>
-import {mapState, mapActions} from 'vuex';
+import {mapActions, mapState} from 'vuex';
 
 export default {
   name: "OfferDetail",
@@ -163,14 +166,12 @@ export default {
     }
   },
   async created() {
-    alert();
     await this.fetchSingleOffer(this.$route.params.offerId)
-    this.offer = this.singleOffer.offer
-    this.reviews = this.singleOffer.reviews
+    this.offer = await this.singleOffer.offer
+    this.reviews = await this.singleOffer.reviews
   },
   methods: {
     ...mapActions('Offers', ['fetchSingleOffer']),
-    ...mapActions('Scores', ['postScore']),
 
     formattedTimestamp(review) {
       const date = new Date(review['reviewTimestamp']);
@@ -178,18 +179,86 @@ export default {
     },
 
     async sendHelpful(helpful, review) {
-      const score = await this.$http.post('/scores', {helpful: `${helpful}`, reviewId: `${review.id}`})
-      const index = this.reviews.findIndex(r => r === review)
-      if (score)
-        this.reviews[index]['userVoted'] = score
-      else
-        this.reviews[index]['userVoted'] = null
+      const index = this.reviews.findIndex(r => r === review);
+
+      if (!this.reviews[index]['scoreBalance']['userVote']) {
+        await this.createNewScore(helpful, review, index);
+      } else if (this.reviews[index]['scoreBalance']['userVote']['helpful'] === helpful) {
+        await this.updateScore(helpful, review, index);
+      } else {
+        await this.deleteScore(helpful, review, index);
+      }
     },
 
-    getHelpfulColor(helpful, review) {
-      if (review['score']['userVoted'] && review['score']['userVoted']['helpful'] === helpful)
+    async createNewScore(helpful, review, index) {
+      let response = await this.$http.post('/scores', {
+        helpful: `${helpful}`,
+        reviewId: `${review.id}`
+      })
+      this.reviews[index]['scoreBalance']['userVote'] = response.data;
+
+      if (helpful === true) {
+        this.reviews[index]['scoreBalance']['helpfulCount']++;
+      } else {
+        this.reviews[index]['scoreBalance']['unhelpfulCount']++;
+      }
+    },
+
+    async updateScore(helpful, review, index) {
+      let response = await this.$http.get('/scores', {
+        params: {
+          userId: this.$tokenManager.getUserId(),
+          reviewId: review.id
+        }
+      })
+      let score = response.data;
+
+      await this.$http.delete(`/scores/${score['id']}`);
+      this.reviews[index]['scoreBalance']['userVote'] = null;
+      if (helpful === true) {
+        this.reviews[index]['scoreBalance']['helpfulCount']--;
+      } else {
+        this.reviews[index]['scoreBalance']['unhelpfulCount']--;
+      }
+    },
+
+    async deleteScore(helpful, review, index) {
+      let response = await this.$http.get('/scores', {
+        params: {
+          userId: this.$tokenManager.getUserId(),
+          reviewId: review.id
+        }
+      })
+      let score = response.data;
+
+      this.reviews[index]['scoreBalance']['userVote'] = await this.$http.update(`/scores/${score.id}`, {
+        helpful: `${helpful}`,
+        reviewId: `${review.id}`
+      })
+      if (helpful === true) {
+        this.reviews[index]['scoreBalance']['helpfulCount']++;
+        this.reviews[index]['scoreBalance']['unhelpfulCount']--;
+      } else {
+        this.reviews[index]['scoreBalance']['helpfulCount']--;
+        this.reviews[index]['scoreBalance']['unhelpfulCount']++;
+      }
+    },
+
+    getThumbUpCount(helpful, review) {
+      if (helpful === true) return this.reviews.find(r => r === review)['scoreBalance']['helpfulCount']
+      if (helpful === false) return this.reviews.find(r => r === review)['scoreBalance']['unhelpfulCount']
+    },
+
+    getThumbColor(helpful, review) {
+      if (review['scoreBalance']['userVote'] && review['scoreBalance']['userVote']['helpful'] === helpful)
         return "primary";
-      return "disabled";
+      else if (review['userFrom'] && review['userFrom']['id'] === this.$tokenManager.getUserId())
+        return "disabled";
+      return "black";
+    },
+
+    isThumbDisabled(review) {
+      return review['userFrom'] && review['userFrom']['id'] === this.$tokenManager.getUserId()
     },
   }
 }
