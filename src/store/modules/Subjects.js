@@ -5,13 +5,13 @@ const state = {
 
 const getters = {
     subjects: state => state.subjects,
-    didLoadSubjects: state => state.didLoadSubjects
+    didLoadSubjects: state => state.didLoadSubjects,
 }
 
 const actions = {
-    async fetchSubjects({commit}, facultyId) {
+    async fetchSubjects({commit}, subjectId) {
         commit('startedDataDownload');
-        const response = await this._vm.$http.get('/subjects', {params: {facultyId}});
+        const response = await this._vm.$http.get('/subjects', {params: {subjectId}});
         commit('setSubjects', response.data);
         commit('finishedDataDownload');
     },

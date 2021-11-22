@@ -22,7 +22,6 @@ const mutations = {
     setUniversities: (state, universities) => (state.universities = universities),
     startedDataDownload: state => state.didLoadUniversities = false,
     finishedDataDownload: state => state.didLoadUniversities = true,
-    switchFilter: state => state.showFilter = !state.showFilter
 }
 
 export default {

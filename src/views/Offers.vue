@@ -1,6 +1,6 @@
 <template>
-  <v-container :fill-height="!didLoadOffers" fluid>
-    <v-row align="center" justify="center" v-if="!didLoadOffers">
+  <v-container :fill-height="!this.didLoadOffers" fluid>
+    <v-row align="center" justify="center" v-if="!this.didLoadOffers">
       <v-progress-circular indeterminate size="100" color="secondary"/>
     </v-row>
     <v-row v-else>
@@ -13,7 +13,7 @@
         <v-container>
           <search-bar/>
           <v-row>
-            <template v-for="offer in this.offers">
+            <template v-for="offer in filteredOffers">
               <v-col cols="12" md="6" :key="offer.id">
                 <v-hover v-slot="{ hover }">
                   <v-card class="pb-4"
@@ -35,7 +35,7 @@
                       </v-row>
                       <v-row class="mt-n12">
                         <v-col>
-                          <v-card-title v-if="offer['reviewBalance']['starsAverage'] !== null"
+                          <v-card-title v-if="offer['reviewBalance']['starsAverage'] !== 0"
                                         class="secondary--text">
                             <v-rating class="ml-n1"
                                       half-increments
@@ -64,18 +64,15 @@
                           v-if="hover"
                           absolute
                           color="ternary">
-                        <v-btn color="quaternary">Více informací</v-btn>
+                        <v-btn color="quaternary" @click="viewDetail(offer.id)" :to="{path: `/offers/${offer.id}`}">
+                          Více informací
+                        </v-btn>
                       </v-overlay>
                     </v-fade-transition>
                   </v-card>
                 </v-hover>
               </v-col>
             </template>
-          </v-row>
-          <v-row align="end" justify="center">
-            <v-col align-self="end">
-              <v-pagination :length="6"/>
-            </v-col>
           </v-row>
         </v-container>
       </v-col>
@@ -85,7 +82,7 @@
 
 <script>
 import FilterDrawer from "../components/FilterDrawer";
-import {mapState, mapActions} from 'vuex';
+import {mapState, mapActions, mapGetters} from 'vuex';
 import SearchBar from "../components/SearchBar";
 
 export default {
@@ -96,7 +93,12 @@ export default {
     ...mapActions('Offers', ['fetchOffers']),
   },
   computed: {
-    ...mapState('Offers', ['offers', 'didLoadOffers', 'showFilter'])
+    ...mapState('Offers', ['offers', 'didLoadOffers', 'showFilter']),
+    ...mapGetters('Offers', ['getOffers']),
+
+    filteredOffers() {
+      return this.getOffers
+    }
   },
   filters: {
     shorten(text) {

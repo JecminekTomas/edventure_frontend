@@ -1,50 +1,49 @@
 <template>
-  <v-container fluid>
-    <v-row class="mx-1">
-      <v-col cols="12" md="3">
-        <v-autocomplete
-            v-model="university"
-            clearable
-            label="Univerzita"
-            :items="this.universities"
-            item-text="name"
-            item-value="id"/>
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-autocomplete
-            v-model="faculty"
-            clearable
-            label="Fakulta"
-            :disabled="facultyDisabled"
-            :items="this.faculties"
-            item-text="name"
-            item-value="id"
-        />
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-autocomplete
-            v-model="subject"
-            clearable
-            label="Předmět"
-            :disabled="subjectDisabled"
-            :items="this.subjects"
-            item-text="name"
-            item-value="id"
-        />
-      </v-col>
-      <v-col align-self="center" cols="10" md="2">
-        <v-btn color="secondary" block>
-          <v-icon>mdi-magnify</v-icon>
-          Vyhledat
-        </v-btn>
-      </v-col>
-      <v-col align-self="center" cols="2" md="1">
-        <v-btn color="primary" block @click="this.switchFilter">
-          <v-icon>mdi-filter</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-row class="mx-1">
+    <v-col cols="12" md="3">
+      <v-autocomplete
+          v-model="university"
+          clearable
+          label="Univerzita"
+          :items="this.universities"
+          item-text="name"
+          item-value="id"
+          @click:clear="clearUniversity"
+          @change="clearFaculty"
+      />
+    </v-col>
+    <v-col cols="12" md="3">
+      <v-autocomplete
+          v-model="faculty"
+          clearable
+          label="Fakulta"
+          :disabled="facultyDisabled"
+          :items="this.faculties"
+          item-text="name"
+          item-value="id"
+          @click:clear="clearFaculty"
+          @change="clearSubject"
+      />
+    </v-col>
+    <v-col cols="12" md="3">
+      <v-autocomplete
+          v-model="subject"
+          clearable
+          label="Předmět"
+          :disabled="subjectDisabled"
+          :items="this.subjects"
+          item-text="name"
+          item-value="id"
+          @click:clear="clearSubject"
+      />
+    </v-col>
+    <v-col align-self="center" cols="12" md="3">
+      <v-btn color="secondary" block :disabled="searchDisabled" @click="searchClick">
+        <v-icon>mdi-magnify</v-icon>
+        Vyhledat
+      </v-btn>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -56,14 +55,36 @@ export default {
     return {
       university: null,
       faculty: null,
-      subject: null
+      subject: null,
+      clickedSearch: false
     }
   },
   methods: {
-    ...mapActions('Offers', ['switchFilter']),
+    ...mapActions('Offers', ['switchFilter', 'setSubjectFilter']),
     ...mapActions('Universities', ['fetchUniversities']),
     ...mapActions('Faculties', ['fetchFaculties']),
     ...mapActions('Subjects', ['fetchSubjects']),
+
+    searchClick() {
+      this.switchFilter(true)
+      this.setSubjectFilter(this.subject)
+      this.clickedSearch = true
+    },
+
+    clearUniversity() {
+      this.university = null
+      this.clearFaculty()
+    },
+
+    clearFaculty() {
+      this.faculty = null
+      this.clearSubject()
+    },
+
+    clearSubject() {
+      this.subject = null
+      this.clickedSearch = false
+    }
   },
   computed: {
     ...mapState('Universities', ['universities']),
@@ -73,9 +94,15 @@ export default {
     facultyDisabled() {
       return !this.university
     },
+
     subjectDisabled() {
       return !this.faculty
-    }
+    },
+
+    searchDisabled() {
+      return !this.subject
+    },
+
   },
 
   watch: {

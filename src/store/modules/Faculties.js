@@ -9,9 +9,9 @@ const getters = {
 }
 
 const actions = {
-    async fetchFaculties({commit}, universityId) {
+    async fetchFaculties({commit}, facultyId) {
         commit('startedDataDownload');
-        const response = await this._vm.$http.get('/faculties', {params: {universityId}});
+        const response = await this._vm.$http.get('/faculties', {params: {facultyId}});
         commit('setFaculties', response.data);
         commit('finishedDataDownload');
     },

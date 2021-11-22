@@ -7,6 +7,7 @@ import Offers from "../views/Offers";
 import {tokenManager} from "../main";
 import NewOffer from "../views/NewOffer";
 import Profile from "../views/Profile";
+import OfferDetail from "../views/OfferDetail";
 
 Vue.use(VueRouter)
 
@@ -27,7 +28,15 @@ const routes = [
         component: Offers,
         meta: {
             requireAuth: true
-        }
+        },
+    },
+    {
+        path: "/offers/:offerId",
+        component: OfferDetail,
+        name: "offerDetail",
+        meta: {
+            requireAuth: true
+        },
     },
     {
         path: '/new_offer',
