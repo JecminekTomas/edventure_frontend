@@ -1,10 +1,7 @@
 const state = {
-
-    singleOffer: null,
-
     offers: [],
+
     didLoadOffers: false,
-    showFilter: false,
 
     // Sorts
     priceSort: null,
@@ -12,6 +9,8 @@ const state = {
     starsCountSort: null,
 
     // Filters
+    showFilter: false,
+
     subjectFilter: null,
     priceFromFilter: null,
     priceToFilter: null,
@@ -20,8 +19,6 @@ const state = {
 }
 
 const getters = {
-
-    singleOffer: state => state.singleOffer,
 
     getOffers: state => {
 
@@ -75,27 +72,13 @@ const getters = {
     },
 
     showFilter: state => state.showFilter,
-    didLoadOffers: state => state.didLoadOffers
+    didLoadOffers: state => state.didLoadOffers,
 }
 
 const actions = {
 
-    async fetchSingleOffer({commit}, id) {
-        commit('startedDataDownload');
-        const response = await this._vm.$http.get(`/offers/${id}`);
-        commit('setSingleOffer', response.data);
-        commit('finishedDataDownload');
-    },
-
     async fetchOffers({commit}) {
         commit('startedDataDownload')
-        const response = await this._vm.$http.get('/offers');
-        commit('setOffers', response.data);
-        commit('finishedDataDownload');
-    },
-
-    async fetchOffersBySubject({commit}) {
-        commit('startedDataDownload');
         const response = await this._vm.$http.get('/offers');
         commit('setOffers', response.data);
         commit('finishedDataDownload');
@@ -139,9 +122,8 @@ const actions = {
 }
 
 const mutations = {
-    setSingleOffer: (state, singleOffer) => (state.singleOffer = singleOffer),
-
     setOffers: (state, offers) => (state.offers = offers),
+
     startedDataDownload: state => state.didLoadOffers = false,
     finishedDataDownload: state => state.didLoadOffers = true,
 

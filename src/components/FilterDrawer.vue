@@ -72,6 +72,7 @@ export default {
       priceFrom: null,
       priceTo: null,
       minStars: null,
+      buttonClicked: false,
 
       states: [
         {icon: null, color: 'black'},
@@ -104,6 +105,11 @@ export default {
   computed: {
     applyFilterDisabled() {
       return !this.priceFrom && !this.priceTo && !this.minStars && this.activeButtonStateIndex === 0
+    },
+    //FIXME
+    filterText() {
+      if (this.applyFilterDisabled() && this.buttonClicked === true) return "Aplikovat"
+      else return "Smazat"
     }
   },
   methods: {

@@ -1,6 +1,6 @@
 <template>
-  <v-container :fill-height="!this.didLoadOffers" fluid>
-    <v-row align="center" justify="center" v-if="!this.didLoadOffers">
+  <v-container :fill-height="!this.didLoadOffer" fluid>
+    <v-row align="center" justify="center" v-if="!this.didLoadOffer">
       <v-progress-circular indeterminate size="100" color="secondary"/>
     </v-row>
     <v-row v-else>
@@ -63,8 +63,8 @@
             </v-col>
             <v-col cols="12" md="5">
               <v-card-title class="px-10 d-flex justify-md-end">
-                <v-btn color="secondary">
-                  Přidat recenzi
+                <v-btn color="secondary" :disabled="alreadyReviewed">
+                  {{ addReviewButtonText }}
                 </v-btn>
               </v-card-title>
             </v-col>
@@ -157,21 +157,34 @@ import {mapActions, mapState} from 'vuex';
 export default {
   name: "OfferDetail",
   computed: {
-    ...mapState('Offers', ['singleOffer', 'didLoadOffers']),
-  },
-  data() {
-    return {
-      offer: null,
-      reviews: null
+    ...mapState('OfferDetail', ['offerDetail', 'didLoadOffer']),
+    alreadyReviewed() {
+      const offer = this.offerDetail['reviews'].find(r => r['userFrom']['id'] === this.$tokenManager.getUserId())
+      if (offer) {
+        return this.offerDetail['reviews'].find(r => r['userFrom']['id'] === this.$tokenManager.getUserId())['subjectId'] !== this.offerDetail['offer']['subjectId']
+      }
+      return false
+    },
+    addReviewButtonText() {
+      if (this.alreadyReviewed) return "Tuto nabídku jste již ohodnotil"
+      return "Přidat recenzi"
+    },
+    offer() {
+      return this.offerDetail['offer']
+    },
+    reviews() {
+      return this.offerDetail['reviews']
     }
   },
-  async created() {
-    await this.fetchSingleOffer(this.$route.params.offerId)
-    this.offer = await this.singleOffer.offer
-    this.reviews = await this.singleOffer.reviews
+  data() {
+    return {}
   },
+  async created() {
+    await this.fetchOffer(this.$route.params.offerId)
+  },
+
   methods: {
-    ...mapActions('Offers', ['fetchSingleOffer']),
+    ...mapActions('OfferDetail', ['fetchOffer']),
 
     formattedTimestamp(review) {
       const date = new Date(review['reviewTimestamp']);
@@ -179,14 +192,14 @@ export default {
     },
 
     async sendHelpful(helpful, review) {
-      const index = this.reviews.findIndex(r => r === review);
+      const index = this.offerDetail['reviews'].findIndex(r => r === review);
 
-      if (!this.reviews[index]['scoreBalance']['userVote']) {
+      if (!this.offerDetail['reviews'][index]['scoreBalance']['userVote']) {
         await this.createNewScore(helpful, review, index);
-      } else if (this.reviews[index]['scoreBalance']['userVote']['helpful'] === helpful) {
-        await this.updateScore(helpful, review, index);
-      } else {
+      } else if (this.offerDetail['reviews'][index]['scoreBalance']['userVote']['helpful'] === helpful) {
         await this.deleteScore(helpful, review, index);
+      } else {
+        await this.updateScore(helpful, review, index);
       }
     },
 
@@ -195,30 +208,12 @@ export default {
         helpful: `${helpful}`,
         reviewId: `${review.id}`
       })
-      this.reviews[index]['scoreBalance']['userVote'] = response.data;
+      this.offerDetail['reviews'][index]['scoreBalance']['userVote']['helpful'] = response.data['helpful'];
 
       if (helpful === true) {
-        this.reviews[index]['scoreBalance']['helpfulCount']++;
+        this.offerDetail['reviews'][index]['scoreBalance']['helpfulCount']++;
       } else {
-        this.reviews[index]['scoreBalance']['unhelpfulCount']++;
-      }
-    },
-
-    async updateScore(helpful, review, index) {
-      let response = await this.$http.get('/scores', {
-        params: {
-          userId: this.$tokenManager.getUserId(),
-          reviewId: review.id
-        }
-      })
-      let score = response.data;
-
-      await this.$http.delete(`/scores/${score['id']}`);
-      this.reviews[index]['scoreBalance']['userVote'] = null;
-      if (helpful === true) {
-        this.reviews[index]['scoreBalance']['helpfulCount']--;
-      } else {
-        this.reviews[index]['scoreBalance']['unhelpfulCount']--;
+        this.offerDetail['reviews'][index]['scoreBalance']['unhelpfulCount']++;
       }
     },
 
@@ -231,22 +226,43 @@ export default {
       })
       let score = response.data;
 
-      this.reviews[index]['scoreBalance']['userVote'] = await this.$http.update(`/scores/${score.id}`, {
+      await this.$http.delete(`/scores/${score['id']}`);
+      this.offerDetail['reviews'][index]['scoreBalance']['userVote'] = null;
+      if (helpful === true) {
+        this.offerDetail['reviews'][index]['scoreBalance']['helpfulCount']--;
+      } else {
+        this.offerDetail['reviews'][index]['scoreBalance']['unhelpfulCount']--;
+      }
+    },
+
+    async updateScore(helpful, review, index) {
+      let getResponse = await this.$http.get('/scores', {
+        params: {
+          userId: this.$tokenManager.getUserId(),
+          reviewId: review.id
+        }
+      })
+      let oldScore = getResponse.data;
+
+      let updateResponse = await this.$http.put(`/scores/${oldScore.id}`, {
         helpful: `${helpful}`,
         reviewId: `${review.id}`
       })
+
+      this.offerDetail['reviews'][index]['scoreBalance']['userVote']['helpful'] = updateResponse.data['helpful'];
+
       if (helpful === true) {
-        this.reviews[index]['scoreBalance']['helpfulCount']++;
-        this.reviews[index]['scoreBalance']['unhelpfulCount']--;
+        this.offerDetail['reviews'][index]['scoreBalance']['helpfulCount']++;
+        this.offerDetail['reviews'][index]['scoreBalance']['unhelpfulCount']--;
       } else {
-        this.reviews[index]['scoreBalance']['helpfulCount']--;
-        this.reviews[index]['scoreBalance']['unhelpfulCount']++;
+        this.offerDetail['reviews'][index]['scoreBalance']['helpfulCount']--;
+        this.offerDetail['reviews'][index]['scoreBalance']['unhelpfulCount']++;
       }
     },
 
     getThumbUpCount(helpful, review) {
-      if (helpful === true) return this.reviews.find(r => r === review)['scoreBalance']['helpfulCount']
-      if (helpful === false) return this.reviews.find(r => r === review)['scoreBalance']['unhelpfulCount']
+      if (helpful === true) return this.offerDetail['reviews'].find(r => r === review)['scoreBalance']['helpfulCount']
+      if (helpful === false) return this.offerDetail['reviews'].find(r => r === review)['scoreBalance']['unhelpfulCount']
     },
 
     getThumbColor(helpful, review) {
