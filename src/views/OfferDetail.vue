@@ -63,7 +63,7 @@
             </v-col>
             <v-col cols="12" md="5">
               <v-card-title class="px-10 d-flex justify-md-end">
-                <v-btn color="secondary" :disabled="alreadyReviewed">
+                <v-btn color="secondary" :disabled="alreadyReviewed" :to="{ name: 'newReview', params: { offerId: this.offer.id }}">
                   {{ addReviewButtonText }}
                 </v-btn>
               </v-card-title>
@@ -208,7 +208,7 @@ export default {
         helpful: `${helpful}`,
         reviewId: `${review.id}`
       })
-      this.offerDetail['reviews'][index]['scoreBalance']['userVote']['helpful'] = response.data['helpful'];
+      this.offerDetail['reviews'][index]['scoreBalance']['userVote'] = response.data;
 
       if (helpful === true) {
         this.offerDetail['reviews'][index]['scoreBalance']['helpfulCount']++;
@@ -249,7 +249,7 @@ export default {
         reviewId: `${review.id}`
       })
 
-      this.offerDetail['reviews'][index]['scoreBalance']['userVote']['helpful'] = updateResponse.data['helpful'];
+      this.offerDetail['reviews'][index]['scoreBalance']['userVote'] = updateResponse.data;
 
       if (helpful === true) {
         this.offerDetail['reviews'][index]['scoreBalance']['helpfulCount']++;
