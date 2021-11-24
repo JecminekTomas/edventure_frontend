@@ -1,7 +1,7 @@
 <template>
   <v-container fill-height>
     <v-row justify="center" align="center">
-      <v-col align-self="center" cols="12" md="4">
+      <v-col cols="12" md="4">
         <v-form @submit.prevent="addReview">
           <v-card-title>
             Počet hvězd

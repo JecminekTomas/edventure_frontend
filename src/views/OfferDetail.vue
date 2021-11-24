@@ -77,7 +77,8 @@
               <v-list-item-content>
                 <v-container>
                   <v-card class="pb-4"
-                          elevation="4">
+                          elevation="4"
+                  >
                     <v-container>
                       <v-row justify="start" justify-md="space-between">
                         <v-col cols="12">
@@ -168,10 +169,6 @@ export default {
     },
     isUserAnonymous() {
       return this.offerDetail['reviews']['userFrom'] !== null
-    },
-
-    isScoreDisabled() {
-      return this.isUserAnonymous && !this.alreadyReviewed
     },
 
     addReviewButtonText() {
