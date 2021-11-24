@@ -105,8 +105,7 @@ export default {
       password: "",
       repPassword: "",
     }
-  }
-  ,
+  },
 
   methods: {
 
@@ -119,9 +118,10 @@ export default {
           userName: this.userName,
           password: this.password
         })
-        await this.$router.push({name: "login"})
       } catch (e) {
         this.error = e.response.data.error
+      } finally {
+        await this.$router.push({name: "login"})
       }
     },
   },
@@ -137,8 +137,7 @@ export default {
       !this.$v.userName.maxLength && errors.push('Maximálně 50 znaků')
 
       return errors
-    }
-    ,
+    },
     passwordErrors() {
       const errors = []
       if (!this.$v.password.$dirty)

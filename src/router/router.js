@@ -8,6 +8,7 @@ import {tokenManager} from "../main";
 import NewOffer from "../views/NewOffer";
 import Profile from "../views/Profile";
 import OfferDetail from "../views/OfferDetail";
+import NewReview from "../views/NewReview";
 
 Vue.use(VueRouter)
 
@@ -34,6 +35,14 @@ const routes = [
         path: "/offers/:offerId",
         component: OfferDetail,
         name: "offerDetail",
+        meta: {
+            requireAuth: true
+        },
+    },
+    {
+        path: "/offers/:offerId/new_review",
+        component: NewReview,
+        name: "newReview",
         meta: {
             requireAuth: true
         },

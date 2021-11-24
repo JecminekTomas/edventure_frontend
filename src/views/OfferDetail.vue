@@ -57,13 +57,14 @@
         <v-container>
           <v-row justify="space-between">
             <v-col cols="12" md="5">
-              <v-card-title class="pl-10">
+              <v-card-title class="pl-10 pl-md-0">
                 RECENZE
               </v-card-title>
             </v-col>
             <v-col cols="12" md="5">
-              <v-card-title class="px-10 d-flex justify-md-end">
-                <v-btn color="secondary" :disabled="alreadyReviewed" :to="{ name: 'newReview', params: { offerId: this.offer.id }}">
+              <v-card-title class="px-10 d-flex justify-center justify-md-end">
+                <v-btn color="secondary" :disabled="alreadyReviewed"
+                       :to="{ name: 'newReview', params: { offerId: this.offer.id }}">
                   {{ addReviewButtonText }}
                 </v-btn>
               </v-card-title>
@@ -159,12 +160,20 @@ export default {
   computed: {
     ...mapState('OfferDetail', ['offerDetail', 'didLoadOffer']),
     alreadyReviewed() {
-      const offer = this.offerDetail['reviews'].find(r => r['userFrom']['id'] === this.$tokenManager.getUserId())
+      const offer = this.offerDetail['reviews'].find(r => r['userFrom']?.['id'] === this.$tokenManager.getUserId())
       if (offer) {
         return this.offerDetail['reviews'].find(r => r['userFrom']['id'] === this.$tokenManager.getUserId())['subjectId'] !== this.offerDetail['offer']['subjectId']
       }
       return false
     },
+    isUserAnonymous() {
+      return this.offerDetail['reviews']['userFrom'] !== null
+    },
+
+    isScoreDisabled() {
+      return this.isUserAnonymous && !this.alreadyReviewed
+    },
+
     addReviewButtonText() {
       if (this.alreadyReviewed) return "Tuto nabídku jste již ohodnotil"
       return "Přidat recenzi"
@@ -268,13 +277,11 @@ export default {
     getThumbColor(helpful, review) {
       if (review['scoreBalance']['userVote'] && review['scoreBalance']['userVote']['helpful'] === helpful)
         return "primary";
-      else if (review['userFrom'] && review['userFrom']['id'] === this.$tokenManager.getUserId())
-        return "disabled";
       return "black";
     },
 
     isThumbDisabled(review) {
-      return review['userFrom'] && review['userFrom']['id'] === this.$tokenManager.getUserId()
+      return !review['userFrom'] || review['userFrom']['id'] === this.$tokenManager.getUserId()
     },
   }
 }
