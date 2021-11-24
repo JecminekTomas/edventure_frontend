@@ -65,6 +65,7 @@
               <v-card-title class="px-10 d-flex justify-center justify-md-end">
                 <v-btn color="secondary" :disabled="alreadyReviewed"
                        :to="{ name: 'newReview', params: { offerId: this.offer.id }}">
+                  <v-icon>mdi-note-plus-outline</v-icon>
                   {{ addReviewButtonText }}
                 </v-btn>
               </v-card-title>
@@ -166,9 +167,6 @@ export default {
         return this.offerDetail['reviews'].find(r => r['userFrom']['id'] === this.$tokenManager.getUserId())['subjectId'] !== this.offerDetail['offer']['subjectId']
       }
       return false
-    },
-    isUserAnonymous() {
-      return this.offerDetail['reviews']['userFrom'] !== null
     },
 
     addReviewButtonText() {

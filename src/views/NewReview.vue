@@ -34,7 +34,10 @@
           >
             Pokud zvolíte anonymní recenzi, vaši recenzi nebude možné hodnotit.
           </v-alert>
-          <v-btn block color="primary" type="submit" :disabled="isDisabled">Přidat recenzi</v-btn>
+          <v-btn block color="primary" type="submit" :disabled="isDisabled">
+            <v-icon>mdi-pencil-plus</v-icon>
+            Přidat recenzi
+          </v-btn>
         </v-form>
       </v-col>
     </v-row>
@@ -51,7 +54,7 @@ export default {
   mixins: [validationMixin],
 
   validations: {
-    verbalEvaluation: {minLength: minLength(25), maxLength: maxLength(512)},
+    verbalEvaluation: {minLength: minLength(32), maxLength: maxLength(512)},
   },
   computed: {
     verbalEvaluationErrors() {
@@ -61,7 +64,7 @@ export default {
 
 
       !this.$v.verbalEvaluation.maxLength && errors.push('Maximální délka je 256 znaků')
-      !this.$v.verbalEvaluation.minLength && errors.push('Minimální délka je 25 znaků')
+      !this.$v.verbalEvaluation.minLength && errors.push('Minimální délka je 32 znaků')
       return errors
     },
     hasStars() {
@@ -96,11 +99,6 @@ export default {
         await this.$router.push({name: 'offerDetail', params: {offerId: this.$route.params.offerId}})
       }
     }
-
   }
 }
 </script>
-
-<style scoped>
-
-</style>

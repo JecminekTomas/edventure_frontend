@@ -17,7 +17,7 @@
       <v-spacer/>
 
       <v-toolbar-items>
-        <v-btn fab to="profile" x-large elevation="0" class="hidden-md-and-down no-background-on-click" :ripple="false"
+        <v-btn fab :to="{name: 'profile'}" x-large elevation="0" class="hidden-md-and-down no-background-on-click" :ripple="false"
                active-class="secondary--text">
           <v-icon>mdi-account-circle</v-icon>
         </v-btn>
@@ -35,7 +35,7 @@
       <v-list nav dense>
 
         <v-list-item-group color="secondary">
-          <v-list-item v-model="group" class="no-background-on-click">
+          <v-list-item v-model="group" class="no-background-on-click" :to="{name: 'profile'}">
             <v-list-item-icon>
               <v-icon>mdi-account</v-icon>
             </v-list-item-icon>

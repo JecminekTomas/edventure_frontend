@@ -59,6 +59,9 @@ export default {
       clickedSearch: false
     }
   },
+  async created() {
+    await this.fetchUniversities()
+  },
   methods: {
     ...mapActions('Offers', ['switchFilter', 'setSubjectFilter']),
     ...mapActions('Universities', ['fetchUniversities']),
@@ -113,10 +116,6 @@ export default {
       await this.fetchSubjects(this.faculty.id)
     }
   },
-
-  async created() {
-    await this.fetchUniversities()
-  }
 }
 </script>
 
