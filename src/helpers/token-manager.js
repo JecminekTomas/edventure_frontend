@@ -23,6 +23,19 @@ export default class TokenManager {
         delete axiosInstance.defaults.headers["Authorization"];
     }
 
+    getUserId() {
+        const payload = this.getPayload()
+        const parts = payload.sub.split(",")
+
+        return Number(parts[0].trim())
+    }
+
+    getUsername() {
+        const payload = this.getPayload()
+        const parts = payload.sub.split(",")
+        return parts[1].trim()
+    }
+
     getPayload() {
         if (this.token != null) {
             const parts = this.token.split(".")
@@ -32,22 +45,18 @@ export default class TokenManager {
         return null
     }
 
-    getUserFullName() {
+    getFirstName() {
         const payload = this.getPayload()
         const parts = payload.sub.split(",")
 
-        const firstNamePart = parts[2].trim()
-        const lastNamePart = parts[3].trim()
-
-        return {firstName: `${firstNamePart}`, lastName: `${lastNamePart}`}
+        return parts[2].trim()
     }
 
-
-    getUserId() {
+    getLastName() {
         const payload = this.getPayload()
         const parts = payload.sub.split(",")
 
-        return Number(parts[0].trim())
+        return parts[3].trim()
     }
 
     isUserLogged() {

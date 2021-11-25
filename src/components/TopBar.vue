@@ -17,7 +17,8 @@
       <v-spacer/>
 
       <v-toolbar-items>
-        <v-btn fab :to="{name: 'profile'}" x-large elevation="0" class="hidden-md-and-down no-background-on-click" :ripple="false"
+        <v-btn fab :to="{name: 'profile'}" x-large elevation="0" class="hidden-md-and-down no-background-on-click"
+               :ripple="false"
                active-class="secondary--text">
           <v-icon>mdi-account-circle</v-icon>
         </v-btn>
@@ -73,8 +74,7 @@ export default {
   }),
   computed: {
     fullName() {
-      const fullName = this.$tokenManager.getUserFullName()
-      return `${fullName.lastName} ${fullName.firstName}`
+      return `${this.$tokenManager.getLastName()} ${this.$tokenManager.getFirstName()}`
     }
   },
 

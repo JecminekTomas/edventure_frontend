@@ -121,7 +121,9 @@ export default {
       } catch (e) {
         this.error = e.response.data.error
       } finally {
-        await this.$router.push({name: "login"})
+        if (this.error === null) {
+          await this.$router.push({name: "login"})
+        }
       }
     },
   },
@@ -138,6 +140,29 @@ export default {
 
       return errors
     },
+
+    firstNameErrors() {
+      const errors = []
+      if (!this.$v.firstName.$dirty)
+        return errors
+
+      !this.$v.firstName.required && errors.push('*Povinné pole')
+      !this.$v.firstName.minLength && errors.push('Minimálně 2 znaky')
+
+      return errors
+    },
+
+    lastNameErrors() {
+      const errors = []
+      if (!this.$v.lastName.$dirty)
+        return errors
+
+      !this.$v.lastName.required && errors.push('*Povinné pole')
+      !this.$v.lastName.minLength && errors.push('Minimálně 2 znaky')
+
+      return errors
+    },
+
     passwordErrors() {
       const errors = []
       if (!this.$v.password.$dirty)
@@ -164,28 +189,6 @@ export default {
 
       return errors
     },
-
-    firstNameErrors() {
-      const errors = []
-      if (!this.$v.firstName.$dirty)
-        return errors
-
-      !this.$v.firstName.required && errors.push('*Povinné pole')
-      !this.$v.firstName.minLength && errors.push('Minimálně 2 znaky')
-
-      return errors
-    },
-
-    lastNameErrors() {
-      const errors = []
-      if (!this.$v.lastName.$dirty)
-        return errors
-
-      !this.$v.lastName.required && errors.push('*Povinné pole')
-      !this.$v.lastName.minLength && errors.push('Minimálně 2 znaky')
-
-      return errors
-    }
   }
 }
 </script>

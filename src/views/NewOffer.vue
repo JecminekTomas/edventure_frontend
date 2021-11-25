@@ -62,7 +62,7 @@
                    type="error"
                    class="my-5"
           >
-            {{ this.error }}
+            {{ this.errorMessage }}
           </v-alert>
           <v-btn block color="primary" type="submit" :disabled="isDisabled">
             <v-icon>mdi-note-plus</v-icon>
@@ -95,7 +95,7 @@ export default {
       price: null,
       note: "",
       online: false,
-      error: null
+      errorMessage: null
     }
   },
   async created() {
@@ -136,7 +136,7 @@ export default {
     },
 
     hasServerError() {
-      return this.error !== null
+      return this.errorMessage !== null
     },
 
     facultyDisabled() {
@@ -160,9 +160,9 @@ export default {
           note: this.note
         })
       } catch (e) {
-        this.error = e.response.data.message
+        this.errorMessage = e.response.data.message
       } finally {
-        if (this.error === null) {
+        if (this.errorMessage === null) {
           await this.$router.push({name: 'offers'})
         }
       }
@@ -180,7 +180,7 @@ export default {
 
     clearSubject() {
       this.subjectId = null
-      this.error = null
+      this.errorMessage = null
     }
   },
   watch: {
