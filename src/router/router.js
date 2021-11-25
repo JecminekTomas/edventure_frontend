@@ -6,9 +6,10 @@ import NotFound from "../views/NotFound";
 import Offers from "../views/Offers";
 import {tokenManager} from "../main";
 import NewOffer from "../views/NewOffer";
-import Profile from "../views/Profile";
 import OfferDetail from "../views/OfferDetail";
 import NewReview from "../views/NewReview";
+import ProfileOverview from "../views/ProfileOverview";
+import ProfileDetail from "../views/ProfileDetail";
 
 Vue.use(VueRouter)
 
@@ -58,10 +59,17 @@ const routes = [
     {
         path: '/profile',
         name: 'profile',
-        component: Profile,
+        component: ProfileOverview,
         meta: {
             requireAuth: true
-        }
+        },
+        children: [
+            {
+                path: '/profile/detail',
+                name: 'profileDetail',
+                component: ProfileDetail
+            }
+        ]
     },
     {
         path: '/*',

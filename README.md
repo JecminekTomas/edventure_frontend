@@ -1,4 +1,4 @@
-# edventure_frontend
+# edventure
 
 ## Project setup
 ```
