@@ -15,6 +15,7 @@
               :type="showOldPassword? 'text': 'password'"
               label="Původní heslo"
               color="primary"
+              :error-messages="oldPasswordErrors"
               outlined
               @blur="$v.oldPassword.$touch()"
               :append-icon="showOldPassword? 'mdi-eye' : 'mdi-eye-off'"
@@ -100,24 +101,36 @@ export default {
   mixins: [validationMixin],
 
   validations: {
+    oldPassword: {required},
     newPassword: {
       required, minLength: minLength(8), maxLength: maxLength(32),
-      containsUppercase: function (value) {
+      containsUppercase(value) {
         return /[A-Z]/.test(value)
       },
-      containsLowercase: function (value) {
+      containsLowercase(value) {
         return /[a-z]/.test(value)
       },
-      containsNumber: function (value) {
+      containsNumber(value) {
         return /[0-9]/.test(value)
       },
-      containsSpecial: function (value) {
+      containsSpecial(value) {
         return /[.#?!@$%^&*-]/.test(value)
       }
     },
     repNewPassword: {required, sameAsPassword: sameAs('newPassword')},
   },
   computed: {
+    oldPasswordErrors() {
+      const errors = []
+      if (!this.$v.oldPassword.$dirty)
+        return errors
+
+      !this.$v.oldPassword.required && errors.push('*Povinné pole')
+
+      console.log(!this.$v.oldPassword)
+
+      return errors
+    },
     newPasswordErrors() {
       const errors = []
       if (!this.$v.newPassword.$dirty)
@@ -147,7 +160,11 @@ export default {
 
     saveDisabled() {
       return this.oldPassword === null || this.newPassword === null || this.repNewPassword === null || this.newPasswordErrors.length !== 0 || this.repNewPasswordErrors.length !== 0
-    }
+    },
+
+    hasServerError() {
+      return this.errorMessage !== null
+    },
   },
   data() {
     return {
@@ -158,6 +175,7 @@ export default {
       showOldPassword: false,
       showNewPassword: false,
       showRepNewPassword: false,
+      errorMessage: null
     }
   },
   methods: {
@@ -169,11 +187,10 @@ export default {
     async doUpdate() {
       this.$v.$reset()
       try {
-        await this.$http.put("/change_password", {
+        await this.$http.put("/profile/change_password", {
           userName: this.$tokenManager.getUsername(),
-          newPassword: this.newPassword,
-          repNewPassword: this.repNewPassword,
           oldPassword: this.oldPassword,
+          newPassword: this.newPassword
         })
       } catch (e) {
         this.errorMessage = e.response.data.message
