@@ -17,20 +17,20 @@
         <v-list-item-title>RECENZE</v-list-item-title>
       </template>
 
-      <v-list-item>
+      <v-list-item :to="{name: 'reviewsFromMe'}" color="secondary">
         <v-list-item-content>
           <v-list-item-title>MOJE RECENZE</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item>
+      <v-list-item :to="{name: 'reviewsToMe'}" color="secondary">
         <v-list-item-content>
           <v-list-item-title>RECENZE O MNĚ</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list-group>
 
-    <v-list-item>
+    <v-list-item color="secondary">
       <v-list-item-icon>
         <v-icon>mdi-note-multiple-outline</v-icon>
       </v-list-item-icon>
@@ -47,10 +47,11 @@
     <v-dialog
         v-model="dialog"
         persistent
-        width="auto" :fullscreen="$vuetify.breakpoint.xsOnly"
+        max-width="300px"
+        :fullscreen="$vuetify.breakpoint.xsOnly"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-list-item v-bind="attrs" v-on="on">
+        <v-list-item v-bind="attrs" v-on="on" color="secondary">
           <v-list-item-icon>
             <v-icon>mdi-logout-variant</v-icon>
           </v-list-item-icon>
@@ -81,7 +82,7 @@
     </v-dialog>
     <v-list-item class="d-md-none d-md-none">
       <v-btn block elevation="0" @click="switchMenu()">
-        <v-icon>{{menuChevron}}</v-icon>
+        <v-icon>{{ menuChevron }}</v-icon>
         Nabídka
       </v-btn>
     </v-list-item>

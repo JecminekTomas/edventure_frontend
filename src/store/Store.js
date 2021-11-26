@@ -5,6 +5,7 @@ import OfferDetail from "./modules/OfferDetail";
 import Universities from "./modules/Universities";
 import Faculties from "./modules/Faculties";
 import Subjects from "./modules/Subjects";
+import Reviews from './modules/Reviews'
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export default new Vuex.Store({
         OfferDetail,
         Universities,
         Faculties,
-        Subjects
+        Subjects,
+        Reviews
     }
 })

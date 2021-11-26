@@ -11,6 +11,8 @@ import NewReview from "../views/NewReview";
 import ProfileOverview from "../views/ProfileOverview";
 import ProfileDetail from "../views/ProfileDetail";
 import PasswordChange from "../views/PasswordChange";
+import ReviewsFromMe from "../views/ReviewsFromMe";
+import ReviewsToMe from "../views/ReviewsToMe";
 
 Vue.use(VueRouter)
 
@@ -74,6 +76,16 @@ const routes = [
                 path: '/profile/password_change',
                 name: 'passwordChange',
                 component: PasswordChange
+            },
+            {
+                path: '/profile/reviews/from_me',
+                name: 'reviewsFromMe',
+                component: ReviewsFromMe
+            },
+            {
+                path: '/profile/reviews/to_me',
+                name: 'reviewsToMe',
+                component: ReviewsToMe
             }
         ]
     },

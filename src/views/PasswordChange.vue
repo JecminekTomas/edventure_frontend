@@ -17,9 +17,10 @@
               color="primary"
               :error-messages="oldPasswordErrors"
               outlined
-              @blur="$v.oldPassword.$touch()"
               :append-icon="showOldPassword? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showOldPassword = !showOldPassword"
+              @blur="$v.oldPassword.$touch()"
+              @click="$v.oldPassword.$touch()"
           />
           <v-text-field
               v-model="newPassword"
@@ -31,6 +32,7 @@
               :append-icon="showNewPassword? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showNewPassword = !showNewPassword"
               @blur="$v.newPassword.$touch()"
+              @click="$v.newPassword.$touch()"
           />
           <v-text-field
               v-model="repNewPassword"
@@ -42,6 +44,7 @@
               :append-icon="showRepNewPassword? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showRepNewPassword = !showRepNewPassword"
               @blur="$v.repNewPassword.$touch()"
+              @click="$v.repNewPassword.$touch()"
           />
           <v-dialog
               v-model="dialog"
@@ -120,14 +123,13 @@ export default {
     repNewPassword: {required, sameAsPassword: sameAs('newPassword')},
   },
   computed: {
+
     oldPasswordErrors() {
       const errors = []
       if (!this.$v.oldPassword.$dirty)
         return errors
 
       !this.$v.oldPassword.required && errors.push('*Povinné pole')
-
-      console.log(!this.$v.oldPassword)
 
       return errors
     },
@@ -159,7 +161,11 @@ export default {
     },
 
     saveDisabled() {
-      return this.oldPassword === null || this.newPassword === null || this.repNewPassword === null || this.newPasswordErrors.length !== 0 || this.repNewPasswordErrors.length !== 0
+      return this.oldPassword === null || this.newPassword === null || this.repNewPassword === null || this.newPasswordErrors.length !== 0 || this.repNewPasswordErrors.length !== 0 || this.samePasswords
+    },
+
+    samePasswords() {
+      return this.oldPassword === this.newPassword
     },
 
     hasServerError() {

@@ -5,7 +5,6 @@ const state = {
 
 const getters = {
     universities: state => state.universities,
-    showFilter: state => state.showFilter,
     didLoadUniversities: state => state.didLoadUniversities
 }
 
