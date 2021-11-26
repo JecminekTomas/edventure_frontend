@@ -49,8 +49,7 @@
                   :disabled="!dataHasChanged"
                   @click="switchDialog"
                   v-bind="attrs"
-                  v-on="on"
-              >
+                  v-on="on">
                 Uložit změny
               </v-btn>
             </template>

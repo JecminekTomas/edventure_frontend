@@ -36,7 +36,6 @@
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   @click:append="showPassword = !showPassword"
                   @blur="$v.password.$touch()"
-                  :counter="32"
               />
               <v-text-field
                   v-model="repPassword"
@@ -89,7 +88,7 @@ export default {
         return /[0-9]/.test(value)
       },
       containsSpecial: function (value) {
-        return /[#?!@$%^&*-]/.test(value)
+        return /[.#?!@$%^&*-]/.test(value)
       }
     },
     repPassword: {required, sameAsPassword: sameAs('password')},

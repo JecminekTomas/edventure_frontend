@@ -10,6 +10,7 @@ import OfferDetail from "../views/OfferDetail";
 import NewReview from "../views/NewReview";
 import ProfileOverview from "../views/ProfileOverview";
 import ProfileDetail from "../views/ProfileDetail";
+import PasswordChange from "../views/PasswordChange";
 
 Vue.use(VueRouter)
 
@@ -68,6 +69,11 @@ const routes = [
                 path: '/profile/detail',
                 name: 'profileDetail',
                 component: ProfileDetail
+            },
+            {
+                path: '/profile/password_change',
+                name: 'passwordChange',
+                component: PasswordChange
             }
         ]
     },

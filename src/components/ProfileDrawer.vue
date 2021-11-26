@@ -37,7 +37,7 @@
       <v-list-item-title>MOJE NABÍDKY</v-list-item-title>
     </v-list-item>
 
-    <v-list-item>
+    <v-list-item :to="{name: 'passwordChange'}" color="secondary">
       <v-list-item-icon>
         <v-icon>mdi-key-alert-outline</v-icon>
       </v-list-item-icon>
