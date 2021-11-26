@@ -30,7 +30,7 @@
       </v-list-item>
     </v-list-group>
 
-    <v-list-item color="secondary">
+    <v-list-item :to="{name: 'offersFromMe'}" color="secondary">
       <v-list-item-icon>
         <v-icon>mdi-note-multiple-outline</v-icon>
       </v-list-item-icon>

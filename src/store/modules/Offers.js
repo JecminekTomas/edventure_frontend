@@ -84,6 +84,14 @@ const actions = {
         commit('finishedDataDownload');
     },
 
+    async fetchOffersByOwner({commit}, {ownerId}) {
+        commit('startedDataDownload')
+        const response = await this._vm.$http.get(`/offers/by/${ownerId}`);
+        commit('setOffers', response.data);
+        console.log(response.data)
+        commit('finishedDataDownload');
+    },
+
     // SORTS
     setPriceSort({commit}, value) {
         commit('setPriceSort', value)

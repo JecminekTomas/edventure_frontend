@@ -3,8 +3,8 @@
     <v-row align="center" justify="center" v-if="!this.didLoadReviews">
       <v-progress-circular indeterminate size="100" color="secondary"/>
     </v-row>
-    <v-row v-else>
-      <v-col cols="12">
+    <v-row v-else justify="center">
+      <v-col cols="12" md="8">
         <v-list>
           <v-list-item
               v-for="review in reviews"
@@ -83,7 +83,7 @@
 import {mapActions, mapState} from 'vuex';
 
 export default {
-  name: "ReviewsToMe",
+  name: "ReviewsToUser",
   computed: {
     ...mapState('Reviews', ['reviews', 'didLoadReviews'])
   },

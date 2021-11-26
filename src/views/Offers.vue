@@ -89,7 +89,6 @@ import SearchBar from "../components/SearchBar";
 export default {
   name: "Offers",
   components: {SearchBar, FilterDrawer},
-
   methods: {
     ...mapActions('Offers', ['fetchOffers']),
   },
