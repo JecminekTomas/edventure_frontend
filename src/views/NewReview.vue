@@ -22,6 +22,7 @@
               clearable
               outlined
               @blur="$v.verbalEvaluation.$touch()"
+              @input="$v.verbalEvaluation.$touch()"
               label="Slovní hodnocení (nepovinné)"
               :counter="512"
           />
@@ -96,7 +97,9 @@ export default {
       } catch (e) {
         this.error = e.response.data.error
       } finally {
-        await this.$router.push({name: 'offerDetail', params: {offerId: this.$route.params.offerId}})
+        if (this.error === null) {
+          await this.$router.push({name: 'offerDetail', params: {offerId: this.$route.params.offerId}})
+        }
       }
     }
   }

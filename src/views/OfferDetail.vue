@@ -83,7 +83,7 @@
                     <v-container>
                       <v-row justify="start" justify-md="space-between">
                         <v-col cols="12">
-                          <v-card-title v-if="review['userFrom']">
+                          <v-card-title v-if="review['anonymous'] === false">
                             {{ `od ${review['userFrom']['lastName']} ${review['userFrom']['firstName']}` }}
                           </v-card-title>
                           <v-card-title v-else>
@@ -192,7 +192,7 @@ export default {
 
     formattedTimestamp(review) {
       const date = new Date(review['reviewTimestamp']);
-      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear().toString().substr(-2)}`
+      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear().toString()}`
     },
 
     async sendHelpful(helpful, review) {
@@ -276,7 +276,7 @@ export default {
     },
 
     isThumbDisabled(review) {
-      return !review['userFrom'] || review['userFrom']['id'] === this.$tokenManager.getUserId()
+      return review['userFrom']['id'] === this.$tokenManager.getUserId()
     },
   }
 }

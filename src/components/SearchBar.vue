@@ -2,7 +2,7 @@
   <v-row class="mx-1">
     <v-col cols="12" md="3">
       <v-autocomplete
-          v-model="university"
+          v-model="universityId"
           clearable
           label="Univerzita"
           :items="this.universities"
@@ -14,10 +14,10 @@
     </v-col>
     <v-col cols="12" md="3">
       <v-autocomplete
-          v-model="faculty"
+          v-model="facultyId"
           clearable
           label="Fakulta"
-          :disabled="facultyDisabled"
+          :disabled="facultyIdDisabled"
           :items="this.faculties"
           item-text="name"
           item-value="id"
@@ -27,12 +27,12 @@
     </v-col>
     <v-col cols="12" md="3">
       <v-autocomplete
-          v-model="subject"
+          v-model="subjectId"
           clearable
           label="Předmět"
-          :disabled="subjectDisabled"
+          :disabled="subjectIdDisabled"
           :items="this.subjects"
-          item-text="name"
+          :item-text="item => item.code +' - '+ item.name"
           item-value="id"
           @click:clear="clearSubject"
       />
@@ -53,68 +53,90 @@ export default {
   name: "SearchBar",
   data() {
     return {
-      university: null,
-      faculty: null,
-      subject: null,
+      universityId: null,
+      facultyId: null,
+      subjectId: null,
       clickedSearch: false
     }
   },
   async created() {
     await this.fetchUniversities()
   },
+  async mounted() {
+    await this.setData()
+  },
+  async beforeDestroy() {
+    await this.setStore()
+  },
   methods: {
-    ...mapActions('Offers', ['switchFilter', 'setSubjectFilter']),
-    ...mapActions('Universities', ['fetchUniversities']),
-    ...mapActions('Faculties', ['fetchFaculties']),
-    ...mapActions('Subjects', ['fetchSubjects']),
+    ...mapActions('Offers', ['switchFilter', 'setSubjectFilter', 'fetchOffersBySubject']),
+    ...mapActions('Universities', ['fetchUniversities', 'fetchUniversityById']),
+    ...mapActions('Faculties', ['fetchFaculties', 'fetchFacultyById']),
+    ...mapActions('Subjects', ['fetchSubjects', 'fetchSubjectById']),
+
+    setData() {
+      this.universityId = this.university?.id ?? null
+      this.facultyId = this.faculty?.id ?? null
+      this.subjectId = this.subject?.id ?? null
+      console.log(this.university, this.faculty, this.subject)
+    },
+
+    async setStore() {
+      await this.fetchUniversityById(this.universityId)
+      await this.fetchFacultyById(this.facultyId)
+      await this.fetchSubjectById(this.subjectId)
+    },
 
     searchClick() {
       this.switchFilter(true)
-      this.setSubjectFilter(this.subject)
+      this.setSubjectFilter(this.subjectId)
+      this.fetchOffersBySubject(this.subjectId)
       this.clickedSearch = true
     },
 
     clearUniversity() {
-      this.university = null
+      this.universityId = null
       this.clearFaculty()
     },
 
     clearFaculty() {
-      this.faculty = null
+      this.facultyId = null
       this.clearSubject()
     },
 
     clearSubject() {
-      this.subject = null
+      this.switchFilter(false)
+      this.subjectId = null
       this.clickedSearch = false
     }
   },
   computed: {
-    ...mapState('Universities', ['universities']),
-    ...mapState('Faculties', ['faculties']),
-    ...mapState('Subjects', ['subjects']),
+    ...mapState('Universities', ['universities', 'university']),
+    ...mapState('Faculties', ['faculties', 'faculty']),
+    ...mapState('Subjects', ['subjects', 'subject']),
 
-    facultyDisabled() {
-      return !this.university
+    facultyIdDisabled() {
+      return !this.universityId
     },
 
-    subjectDisabled() {
-      return !this.faculty
+    subjectIdDisabled() {
+      return !this.facultyId
     },
 
     searchDisabled() {
-      return !this.subject
+      return !this.subjectId
     },
 
   },
 
   watch: {
-    async university() {
-      await this.fetchFaculties(this.university.id)
+    async universityId() {
+      await this.fetchFaculties(this.universityId)
     },
-    async faculty() {
-      await this.fetchSubjects(this.faculty.id)
+    async facultyId() {
+      await this.fetchSubjects(this.facultyId)
     }
+
   },
 }
 </script>

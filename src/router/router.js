@@ -14,6 +14,7 @@ import PasswordChange from "../views/PasswordChange";
 import ReviewsFromUser from "../views/ReviewsFromUser";
 import ReviewsToUser from "../views/ReviewsToUser";
 import OffersFromUser from "../views/OffersFromUser";
+import UpdateOffer from "../views/UpdateOffer";
 
 Vue.use(VueRouter)
 
@@ -74,24 +75,29 @@ const routes = [
                 component: ProfileDetail
             },
             {
-                path: '/profile/password_change',
+                path: '/profile/change_password',
                 name: 'passwordChange',
                 component: PasswordChange
             },
             {
                 path: '/profile/reviews/from_me',
-                name: 'reviewsFromMe',
+                name: 'reviewsFromUser',
                 component: ReviewsFromUser
             },
             {
                 path: '/profile/reviews/to_me',
-                name: 'reviewsToMe',
+                name: 'reviewsToUser',
                 component: ReviewsToUser
             },
             {
                 path: '/profile/offers',
-                name: 'offersFromMe',
+                name: 'offersFromUser',
                 component: OffersFromUser
+            },
+            {
+                path: '/profile/offers/:offerId',
+                name: 'updateOffer',
+                component: UpdateOffer
             }
         ]
     },

@@ -17,20 +17,20 @@
         <v-list-item-title>RECENZE</v-list-item-title>
       </template>
 
-      <v-list-item :to="{name: 'reviewsFromMe'}" color="secondary">
+      <v-list-item :to="{name: 'reviewsFromUser'}" color="secondary">
         <v-list-item-content>
           <v-list-item-title>MOJE RECENZE</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item :to="{name: 'reviewsToMe'}" color="secondary">
+      <v-list-item :to="{name: 'reviewsToUser'}" color="secondary">
         <v-list-item-content>
           <v-list-item-title>RECENZE O MNĚ</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list-group>
 
-    <v-list-item :to="{name: 'offersFromMe'}" color="secondary">
+    <v-list-item :to="{name: 'offersFromUser'}" color="secondary">
       <v-list-item-icon>
         <v-icon>mdi-note-multiple-outline</v-icon>
       </v-list-item-icon>

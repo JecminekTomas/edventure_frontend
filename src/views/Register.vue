@@ -4,6 +4,13 @@
       <v-col md="12" lg="4">
         <v-card elevation="10" outlined class="px-10 py-10">
           <v-card-title>Zapsat se do aplikace</v-card-title>
+          <v-alert
+              v-if="error"
+              dense
+              outlined
+              type="error">
+            {{this.error}}
+          </v-alert>
           <v-form @submit.prevent="doRegister">
             <v-card-text>
               <v-text-field
@@ -12,6 +19,7 @@
                   :error-messages="firstNameErrors"
                   color="secondary"
                   @blur="$v.firstName.$touch()"
+                  @input="$v.firstName.$touch()"
               />
               <v-text-field
                   v-model="lastName"
@@ -19,6 +27,7 @@
                   :error-messages="lastNameErrors"
                   color="secondary"
                   @blur="$v.lastName.$touch()"
+                  @input="$v.lastName.$touch()"
               />
               <v-text-field
                   v-model="userName"
@@ -26,6 +35,7 @@
                   :error-messages="userNameErrors"
                   color="secondary"
                   @blur="$v.userName.$touch()"
+                  @input="$v.userName.$touch()"
               />
               <v-text-field
                   v-model="password"
@@ -36,6 +46,7 @@
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   @click:append="showPassword = !showPassword"
                   @blur="$v.password.$touch()"
+                  @input="$v.password.$touch()"
               />
               <v-text-field
                   v-model="repPassword"
@@ -46,16 +57,27 @@
                   :append-icon="showRepPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   @click:append="showRepPassword = !showRepPassword"
                   @blur="$v.repPassword.$touch()"
+                  @input="$v.repPassword.$touch()"
               />
             </v-card-text>
-            <v-btn text plain class="text-caption" :ripple="false" :to="{name: 'login'}">
-              Již máte účet?
-            </v-btn>
             <v-card-actions>
-              <v-btn text class="secondary--text" type="submit">
+              <v-btn text class="secondary--text" type="submit" :disabled="registerButtonDisabled">
                 Zaregistrovat se
               </v-btn>
             </v-card-actions>
+            <v-btn text plain class="text-caption" :ripple="false" :to="{name: 'login'}">
+              Již máte účet?
+            </v-btn>
+            <v-container>
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-select label="Typ kontaktu" color="secondary"/>
+                </v-col>
+                <v-col cols="12" md="8">
+                  <v-text-field label="Hodnota" color="secondary"/>
+                </v-col>
+              </v-row>
+            </v-container>
           </v-form>
         </v-card>
       </v-col>
@@ -65,7 +87,10 @@
 
 <script>
 import {validationMixin} from 'vuelidate'
-import {required, minLength, sameAs, maxLength} from 'vuelidate/lib/validators'
+import {required, minLength, sameAs, maxLength, alphaNum, helpers} from 'vuelidate/lib/validators'
+
+// eslint-disable-next-line no-control-regex
+const alpha = helpers.regex("alpha", /^([^\u0000-\u007F]|[A-Za-z])+$/);
 
 export default {
   name: "Register",
@@ -73,9 +98,9 @@ export default {
   mixins: [validationMixin],
 
   validations: {
-    firstName: {required, minLength: minLength(2)},
-    lastName: {required, minLength: minLength(2)},
-    userName: {required, minLength: minLength(6), maxLength: maxLength(50)},
+    firstName: {required, minLength: minLength(2), alpha},
+    lastName: {required, minLength: minLength(2), alpha},
+    userName: {required, minLength: minLength(6), maxLength: maxLength(50), alphaNum},
     password: {
       required, minLength: minLength(8), maxLength: maxLength(32),
       containsUppercase: function (value) {
@@ -103,6 +128,7 @@ export default {
       lastName: "",
       password: "",
       repPassword: "",
+      error: null,
     }
   },
 
@@ -110,6 +136,7 @@ export default {
 
     async doRegister() {
       this.$v.$reset()
+      this.resetError()
       try {
         await this.$http.post("/register", {
           firstName: this.firstName,
@@ -118,13 +145,22 @@ export default {
           password: this.password
         })
       } catch (e) {
-        this.error = e.response.data.error
+        if (e.response.status === 409) {
+          this.error = "Uživatelské jméno je již používané"
+        } else {
+          this.error = e.response.data.error
+        }
       } finally {
         if (this.error === null) {
           await this.$router.push({name: "login"})
         }
       }
     },
+
+    resetError() {
+      this.error = null
+    },
+
   },
 
   computed: {
@@ -136,6 +172,7 @@ export default {
       !this.$v.userName.required && errors.push('*Povinné pole')
       !this.$v.userName.minLength && errors.push('Minimálně 6 znaků')
       !this.$v.userName.maxLength && errors.push('Maximálně 50 znaků')
+      !this.$v.userName.alphaNum && errors.push('Uživatelské jméno nesmí obsahovat speciální znaky nebo diakritiku')
 
       return errors
     },
@@ -147,6 +184,7 @@ export default {
 
       !this.$v.firstName.required && errors.push('*Povinné pole')
       !this.$v.firstName.minLength && errors.push('Minimálně 2 znaky')
+      !this.$v.firstName.alpha && errors.push('Jméno neobsahuje čísla ani speciální znaky')
 
       return errors
     },
@@ -158,6 +196,7 @@ export default {
 
       !this.$v.lastName.required && errors.push('*Povinné pole')
       !this.$v.lastName.minLength && errors.push('Minimálně 2 znaky')
+      !this.$v.lastName.alpha && errors.push('Příjmení neobsahuje čísla ani speciální znaky')
 
       return errors
     },
@@ -188,6 +227,24 @@ export default {
 
       return errors
     },
+
+    hasErrors() {
+      return (
+          this.userNameErrors.length !== 0
+          || this.firstNameErrors.length !== 0
+          || this.lastNameErrors.length !== 0
+          || this.passwordErrors.length !== 0
+          || this.repPasswordErrors.length !== 0
+      )
+    },
+
+    isFilled() {
+      return (!!this.userName && !!this.firstName && !!this.lastName && !!this.password && !!this.repPassword)
+    },
+
+    registerButtonDisabled() {
+      return (this.hasErrors || !this.isFilled)
+    }
   }
 }
 </script>

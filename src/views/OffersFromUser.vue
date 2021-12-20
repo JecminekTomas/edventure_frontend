@@ -4,56 +4,52 @@
       <v-progress-circular indeterminate size="100" color="secondary"/>
     </v-row>
     <v-row v-else justify="center">
-      <v-col cols="12" md="8">
+      <v-col cols="12" xl="8">
         <v-list-item
             v-for="offer in offers"
             :key="offer['id']">
           <v-list-item-content>
             <v-container>
-              <v-card class="pb-4" elevation="4">
-                <v-container>
-                  <v-row justify="start" justify-md="space-between">
-                    <v-col md="5" cols="12">
-                      <v-card-title>
-                        {{ offer['subjectName'] }}
-                      </v-card-title>
-                      <v-card-subtitle>
-                        {{ offer['subjectCode'] }}
-                      </v-card-subtitle>
-                    </v-col>
-                    <v-col md="5" cols="12">
-                      <v-card-title class="primary--text justify-start justify-md-end mt-n10 mt-md-0">
-                        {{ `${offer['price']} Kč/h` }}
-                      </v-card-title>
-                    </v-col>
-                  </v-row>
-                  <v-row class="mt-n12">
-                    <v-col>
-                      <v-card-title v-if="offer['reviewBalance']['starsAverage'] !== 0"
-                                    class="secondary--text">
-                        <v-rating class="ml-n1"
-                                  half-increments
-                                  hover
-                                  dense
-                                  color="secondary"
-                                  background-color="secondary"
-                                  readonly
-                                  :value="offer['reviewBalance']['starsAverage']"
-                        />
-                        {{ `(${offer['reviewBalance']['reviewCount']})` }}
-                      </v-card-title>
-                      <v-card-title v-else/>
-                    </v-col>
-                  </v-row>
-                  <v-row class="mt-n6">
-                    <v-col>
-                      <v-card-subtitle v-if="offer['note'] !== ''">
-                        {{ offer['note'] | shorten }}
-                      </v-card-subtitle>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card>
+              <v-hover v-slot="{ hover }">
+                <v-card class="pb-4"
+                        :elevation="hover ? 12 : 4"
+                        :class="{ 'on-hover': hover }">
+                  <v-container>
+                    <v-row justify="start" justify-md="space-between">
+                      <v-col md="5" cols="12">
+                        <v-card-title>
+                          {{ offer['subjectName'] }}
+                        </v-card-title>
+                        <v-card-subtitle>
+                          {{ offer['subjectCode'] }}
+                        </v-card-subtitle>
+                      </v-col>
+                      <v-col md="5" cols="12">
+                        <v-card-title class="primary--text justify-start justify-md-end mt-n10 mt-md-0">
+                          {{ `${offer['price']} Kč/h` }}
+                        </v-card-title>
+                      </v-col>
+                    </v-row>
+                    <v-row class="mt-n6">
+                      <v-col>
+                        <v-card-subtitle v-if="offer['note'] !== ''">
+                          {{ offer['note'] | shorten }}
+                        </v-card-subtitle>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-fade-transition>
+                    <v-overlay
+                        v-if="hover"
+                        absolute
+                        color="ternary">
+                      <v-btn color="quaternary" :to="{name: 'updateOffer', params: {offerId: offer.id}}">
+                        Upravit nabídku
+                      </v-btn>
+                    </v-overlay>
+                  </v-fade-transition>
+                </v-card>
+              </v-hover>
             </v-container>
           </v-list-item-content>
         </v-list-item>
@@ -68,7 +64,8 @@ import {mapActions, mapState} from "vuex";
 export default {
   name: "OffersFromUser",
   methods: {
-    ...mapActions('Offers', ['fetchOffersByOwner'])
+    ...mapActions('Offers', ['fetchOffersByOwner', 'setOffer']),
+
   },
   computed: {
     ...mapState('Offers', ['offers', 'didLoadOffers']),
@@ -80,7 +77,7 @@ export default {
     }
   },
   async created() {
-    await this.fetchOffersByOwner({ownerId: this.$tokenManager.getUserId()})
+    await this.fetchOffersByOwner(this.$tokenManager.getUserId())
   },
 }
 </script>

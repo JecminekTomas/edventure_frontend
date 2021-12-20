@@ -84,14 +84,14 @@ export default {
     ...mapState('Reviews', ['reviews', 'didLoadReviews'])
   },
   async created() {
-    await this.fetchReviews({id: this.$tokenManager.getUserId(), who: 'from'})
+    await this.fetchReviewsFrom(this.$tokenManager.getUserId())
   },
   methods: {
-    ...mapActions('Reviews', ['fetchReviews']),
+    ...mapActions('Reviews', ['fetchReviewsFrom']),
 
     formattedTimestamp(review) {
       const date = new Date(review['reviewTimestamp']);
-      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear().toString().substr(-2)}`
+      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear().toString()}`
     },
 
     getThumbUpCount(helpful, review) {

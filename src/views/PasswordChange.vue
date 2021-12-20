@@ -20,7 +20,7 @@
               :append-icon="showOldPassword? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showOldPassword = !showOldPassword"
               @blur="$v.oldPassword.$touch()"
-              @click="$v.oldPassword.$touch()"
+              @input="$v.oldPassword.$touch()"
           />
           <v-text-field
               v-model="newPassword"
@@ -32,7 +32,7 @@
               :append-icon="showNewPassword? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showNewPassword = !showNewPassword"
               @blur="$v.newPassword.$touch()"
-              @click="$v.newPassword.$touch()"
+              @input="$v.newPassword.$touch()"
           />
           <v-text-field
               v-model="repNewPassword"
@@ -44,7 +44,7 @@
               :append-icon="showRepNewPassword? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showRepNewPassword = !showRepNewPassword"
               @blur="$v.repNewPassword.$touch()"
-              @click="$v.repNewPassword.$touch()"
+              @input="$v.repNewPassword.$touch()"
           />
           <v-dialog
               v-model="dialog"
@@ -208,6 +208,7 @@ export default {
         }
       }
     },
+
     resetError() {
       this.errorMessage = null
     }

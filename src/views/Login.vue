@@ -9,7 +9,7 @@
               dense
               outlined
               type="error">
-            Špatné přihlašovací údaje
+            {{this.error}}
           </v-alert>
           <v-form @submit.prevent="doLogin">
             <v-card-text>
@@ -20,6 +20,7 @@
                   color="secondary"
                   @click="resetError"
                   @blur="$v.userName.$touch()"
+                  @input="$v.userName.$touch()"
               />
               <v-text-field
                   v-model="password"
@@ -31,16 +32,17 @@
                   @click:append="showPassword = !showPassword"
                   @click="resetError"
                   @blur="$v.password.$touch()"
+                  @input="$v.password.$touch()"
               />
             </v-card-text>
-            <v-btn text plain class="text-caption" :ripple="false" :to="{name: 'register'}">
-              Ještě nejste zaregistrováni?
-            </v-btn>
             <v-card-actions>
               <v-btn text class="secondary--text" type="submit">
                 Přihlásit se
               </v-btn>
             </v-card-actions>
+            <v-btn text plain class="text-caption" :ripple="false" :to="{name: 'register'}">
+              Ještě nejste zaregistrováni?
+            </v-btn>
           </v-form>
         </v-card>
       </v-col>
@@ -80,7 +82,7 @@ export default {
         this.$tokenManager.setToken(response.data.token)
         await this.$router.push({name: "offers"})
       } catch (e) {
-        if (e.response.statusCode === 401) {
+        if (e.response.status === 401) {
           this.error = "Špatné přihlašovací údaje"
         } else {
           this.error = e.response.data.error

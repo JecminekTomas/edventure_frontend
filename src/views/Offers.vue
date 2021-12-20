@@ -67,7 +67,6 @@
                         <v-btn color="quaternary" :to="{ name: 'offerDetail', params: { offerId: offer.id }}">
                           Více informací
                         </v-btn>
-
                       </v-overlay>
                     </v-fade-transition>
                   </v-card>

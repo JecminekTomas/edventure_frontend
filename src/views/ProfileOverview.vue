@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col cols="12" md="3">
-          <profile-drawer/>
+        <profile-drawer/>
       </v-col>
       <v-col cols="12" md="9">
         <router-view></router-view>
@@ -16,7 +16,7 @@ import ProfileDrawer from "../components/ProfileDrawer";
 
 export default {
   name: "ProfileOverview",
-  components: {ProfileDrawer}
+  components: {ProfileDrawer},
 }
 </script>
 

@@ -4,7 +4,7 @@
       <v-col cols="12" md="4">
         <v-form @submit.prevent="addReview">
           <v-autocomplete
-              v-model="university"
+              v-model="universityId"
               clearable
               label="Univerzita"
               :items="this.universities"
@@ -14,7 +14,7 @@
               @change="clearFaculty"
           />
           <v-autocomplete
-              v-model="faculty"
+              v-model="facultyId"
               clearable
               label="Fakulta"
               :disabled="facultyDisabled"
@@ -30,7 +30,7 @@
               label="Předmět"
               :disabled="subjectDisabled"
               :items="this.subjects"
-              item-text="name"
+              :item-text="item => item.code +' - '+ item.name"
               item-value="id"
               @click:clear="clearSubject"
           />
@@ -40,7 +40,7 @@
               suffix="Kč/h"
               :error-messages="priceErrors"
               @blur="$v.price.$touch()"
-              @touch="$v.price.$touch()"
+              @input="$v.price.$touch()"
           >
 
           </v-text-field>
@@ -85,12 +85,12 @@ export default {
 
   validations: {
     note: {minLength: minLength(32), maxLength: maxLength(2048)},
-    price: {required, maxValue: maxValue(10000), numeric}
+    price: {required, maxValue: maxValue(100000), numeric}
   },
   data() {
     return {
-      university: null,
-      faculty: null,
+      universityId: null,
+      facultyId: null,
       subjectId: null,
       price: null,
       note: "",
@@ -113,6 +113,7 @@ export default {
 
       !this.$v.note.maxLength && errors.push('Maximální délka je 256 znaků')
       !this.$v.note.minLength && errors.push('Minimální délka je 32 znaků')
+
       return errors
     },
 
@@ -123,7 +124,7 @@ export default {
 
       !this.$v.price.required && errors.push('*Povinné pole')
       !this.$v.price.numeric && errors.push('Částka musí být číselná hodnota')
-      !this.$v.price.maxValue && errors.push('Maximální částka je 10.000 Kč/h')
+      !this.$v.price.maxValue && errors.push('Maximální částka je 100.000 Kč/h')
       return errors
     },
 
@@ -131,20 +132,28 @@ export default {
       return this.subjectId !== null
     },
 
-    isDisabled() {
-      return !(this.hasSubject && this.noteErrors.length === 0 && this.price !== null && this.priceErrors.length === 0)
+    hasPrice() {
+      return this.price !== null
+    },
+
+    hasLocalError() {
+      return this.noteErrors.length !== 0 || this.priceErrors.length !== 0
     },
 
     hasServerError() {
       return this.errorMessage !== null
     },
 
+    isDisabled() {
+      return !(this.hasSubject && this.hasPrice && !this.hasLocalError)
+    },
+
     facultyDisabled() {
-      return !this.university
+      return !this.universityId
     },
 
     subjectDisabled() {
-      return !this.faculty
+      return !this.facultyId
     },
   },
   methods: {
@@ -169,12 +178,12 @@ export default {
     },
 
     clearUniversity() {
-      this.university = null
+      this.universityId = null
       this.clearFaculty()
     },
 
     clearFaculty() {
-      this.faculty = null
+      this.facultyId = null
       this.clearSubject()
     },
 
@@ -184,11 +193,11 @@ export default {
     }
   },
   watch: {
-    async university() {
-      await this.fetchFaculties(this.university.id)
+    async universityId() {
+      await this.fetchFaculties(this.universityId)
     },
-    async faculty() {
-      await this.fetchSubjects(this.faculty.id)
+    async facultyId() {
+      await this.fetchSubjects(this.facultyId)
     }
   }
 }

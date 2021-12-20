@@ -9,9 +9,15 @@ const getters = {
 }
 
 const actions = {
-    async fetchReviews({commit}, {id, who}) {
+    async fetchReviewsFrom({commit}, userFromId) {
         commit('startedDataDownload');
-        const response = await this._vm.$http.get(`/reviews/${who}/${id}`);
+        const response = await this._vm.$http.get('/reviews', {params: {userFromId: userFromId}});
+        commit('setReviews', response.data);
+        commit('finishedDataDownload');
+    },
+    async fetchReviewsTo({commit}, userToId) {
+        commit('startedDataDownload');
+        const response = await this._vm.$http.get('/reviews', {params: {userToId: userToId}});
         commit('setReviews', response.data);
         commit('finishedDataDownload');
     },

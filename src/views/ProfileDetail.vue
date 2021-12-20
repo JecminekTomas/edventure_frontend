@@ -17,6 +17,7 @@
               color="primary"
               outlined
               @blur="$v.firstName.$touch()"
+              @input="$v.firstName.$touch()"
               @click="resetError"
           />
           <v-text-field
@@ -26,15 +27,7 @@
               color="primary"
               outlined
               @blur="$v.lastName.$touch()"
-              @click="resetError"
-          />
-          <v-text-field
-              v-model="userName"
-              label="Uživatelské jméno"
-              :error-messages="userNameErrors"
-              color="primary"
-              outlined
-              @blur="$v.userName.$touch()"
+              @input="$v.lastName.$touch()"
               @click="resetError"
           />
           <v-dialog
@@ -90,29 +83,18 @@
 
 <script>
 import {validationMixin} from "vuelidate";
-import {maxLength, minLength, required} from "vuelidate/lib/validators";
+import {minLength, required} from "vuelidate/lib/validators";
+import {uniAlpha} from "../helpers/validators";
 
 export default {
   name: "ProfileDetail",
   mixins: [validationMixin],
 
   validations: {
-    firstName: {required, minLength: minLength(2)},
-    lastName: {required, minLength: minLength(2)},
-    userName: {required, minLength: minLength(6), maxLength: maxLength(50)}
+    firstName: {required, minLength: minLength(2), uniAlpha},
+    lastName: {required, minLength: minLength(2), uniAlpha},
   },
   computed: {
-    userNameErrors() {
-      const errors = []
-      if (!this.$v.userName.$dirty)
-        return errors
-
-      !this.$v.userName.required && errors.push('*Povinné pole')
-      !this.$v.userName.minLength && errors.push('Minimálně 6 znaků')
-      !this.$v.userName.maxLength && errors.push('Maximálně 50 znaků')
-
-      return errors
-    },
 
     firstNameErrors() {
       const errors = []
@@ -121,6 +103,7 @@ export default {
 
       !this.$v.firstName.required && errors.push('*Povinné pole')
       !this.$v.firstName.minLength && errors.push('Minimálně 2 znaky')
+      !this.$v.firstName.alpha && errors.push('Jméno neobsahuje čísla ani speciální znaky')
 
       return errors
     },
@@ -132,6 +115,7 @@ export default {
 
       !this.$v.lastName.required && errors.push('*Povinné pole')
       !this.$v.lastName.minLength && errors.push('Minimálně 2 znaky')
+      !this.$v.lastName.alpha && errors.push('Příjmení neobsahuje čísla ani speciální znaky')
 
       return errors
     },
@@ -146,7 +130,6 @@ export default {
   },
   data() {
     return {
-      userName: null,
       firstName: null,
       lastName: null,
       errorMessage: null,
@@ -155,7 +138,6 @@ export default {
   },
   methods: {
     setValues() {
-      this.userName = this.$tokenManager.getUsername()
       this.firstName = this.$tokenManager.getFirstName()
       this.lastName = this.$tokenManager.getLastName()
     },
@@ -165,21 +147,22 @@ export default {
     },
 
     async doUpdate() {
-      this.$v.$reset()
+      this.$v.$reset();
+
+      let response;
+
       try {
-        await this.$http.put("/profile", {
+        response = await this.$http.put("/profile", {
           id: this.$tokenManager.getUserId(),
           firstName: this.firstName,
           lastName: this.lastName,
-          userName: this.userName,
         })
       } catch (e) {
         this.errorMessage = e.response.data.message
       } finally {
         this.switchDialog()
         if (this.errorMessage === null) {
-          this.$tokenManager.logout()
-          await this.$router.push({name: "login"})
+          this.$tokenManager.setToken(response.data.token)
         }
       }
     },

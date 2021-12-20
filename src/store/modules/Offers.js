@@ -1,4 +1,7 @@
 const state = {
+
+    offer: null,
+
     offers: [],
 
     didLoadOffers: false,
@@ -19,6 +22,8 @@ const state = {
 }
 
 const getters = {
+
+    offer: state => state.offer,
 
     getOffers: state => {
 
@@ -79,16 +84,29 @@ const actions = {
 
     async fetchOffers({commit}) {
         commit('startedDataDownload')
-        const response = await this._vm.$http.get('/offers');
+        const response = await this._vm.$http.get('/offers', {params: {showcase: true}});
         commit('setOffers', response.data);
         commit('finishedDataDownload');
     },
 
-    async fetchOffersByOwner({commit}, {ownerId}) {
+    async fetchOffersByOwner({commit}, ownerId) {
         commit('startedDataDownload')
-        const response = await this._vm.$http.get(`/offers/by/${ownerId}`);
+        const response = await this._vm.$http.get('/offers', {params: {ownerId: ownerId}});
         commit('setOffers', response.data);
-        console.log(response.data)
+        commit('finishedDataDownload');
+    },
+
+    async fetchOffersBySubject({commit}, subjectId) {
+        commit('startedDataDownload')
+        const response = await this._vm.$http.get('/offers', {params: {subjectId: subjectId}});
+        commit('setOffers', response.data);
+        commit('finishedDataDownload');
+    },
+
+    async fetchOffersById({commit}, id) {
+        commit('startedDataDownload')
+        const response = await this._vm.$http.get(`/offers/${id}`);
+        commit('setOffer', response.data.offer);
         commit('finishedDataDownload');
     },
 
@@ -126,11 +144,16 @@ const actions = {
         commit('setMinStarsFilter', minStars)
     },
 
+    setOffer({commit}, offer) {
+        commit('setOffer', offer)
+    },
     // TODO: Rest of them
 }
 
 const mutations = {
     setOffers: (state, offers) => (state.offers = offers),
+
+    setOffer: (state, offer) => (state.offer = offer),
 
     startedDataDownload: state => state.didLoadOffers = false,
     finishedDataDownload: state => state.didLoadOffers = true,
