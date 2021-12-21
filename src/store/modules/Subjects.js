@@ -1,7 +1,7 @@
 const state = {
+    didLoadSubjects: false,
     subject: null,
     subjects: [],
-    didLoadSubjects: false,
 }
 
 const getters = {

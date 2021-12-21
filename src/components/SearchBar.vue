@@ -56,7 +56,6 @@ export default {
       universityId: null,
       facultyId: null,
       subjectId: null,
-      clickedSearch: false
     }
   },
   async created() {
@@ -65,9 +64,7 @@ export default {
   async mounted() {
     await this.setData()
   },
-  async beforeDestroy() {
-    await this.setStore()
-  },
+
   methods: {
     ...mapActions('Offers', ['switchFilter', 'setSubjectFilter', 'fetchOffersBySubject']),
     ...mapActions('Universities', ['fetchUniversities', 'fetchUniversityById']),
@@ -78,7 +75,6 @@ export default {
       this.universityId = this.university?.id ?? null
       this.facultyId = this.faculty?.id ?? null
       this.subjectId = this.subject?.id ?? null
-      console.log(this.university, this.faculty, this.subject)
     },
 
     async setStore() {
@@ -87,11 +83,11 @@ export default {
       await this.fetchSubjectById(this.subjectId)
     },
 
-    searchClick() {
-      this.switchFilter(true)
+    async searchClick() {
       this.setSubjectFilter(this.subjectId)
-      this.fetchOffersBySubject(this.subjectId)
-      this.clickedSearch = true
+      await this.setStore()
+      await this.fetchOffersBySubject(this.subjectId)
+      this.switchFilter(true)
     },
 
     clearUniversity() {
@@ -107,7 +103,6 @@ export default {
     clearSubject() {
       this.switchFilter(false)
       this.subjectId = null
-      this.clickedSearch = false
     }
   },
   computed: {

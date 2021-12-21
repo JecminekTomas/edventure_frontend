@@ -1,10 +1,9 @@
 const state = {
 
-    offer: null,
-
-    offers: [],
-
     didLoadOffers: false,
+
+    offer: null,
+    offers: [],
 
     // Sorts
     priceSort: null,

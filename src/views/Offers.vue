@@ -89,11 +89,12 @@ export default {
   name: "Offers",
   components: {SearchBar, FilterDrawer},
   methods: {
-    ...mapActions('Offers', ['fetchOffers']),
+    ...mapActions('Offers', ['fetchOffers', 'fetchOffersBySubject']),
   },
   computed: {
     ...mapState('Offers', ['offers', 'didLoadOffers', 'showFilter']),
     ...mapGetters('Offers', ['getOffers']),
+    ...mapGetters('Subjects', ['subject']),
 
     filteredOffers() {
       return this.getOffers
@@ -106,7 +107,11 @@ export default {
     }
   },
   async created() {
-    await this.fetchOffers()
+    if (this.subject !== null) {
+      await this.fetchOffersBySubject(this.subject.id)
+    } else {
+      await this.fetchOffers()
+    }
   },
 }
 </script>
