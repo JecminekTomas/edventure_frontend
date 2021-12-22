@@ -60,6 +60,9 @@
                   @input="$v.repPassword.$touch()"
               />
             </v-card-text>
+            <v-card-text class="mt-n5">
+              <contact-list ref="regContactList"/>
+            </v-card-text>
             <v-card-actions>
               <v-btn text class="secondary--text" type="submit" :disabled="registerButtonDisabled">
                 Zaregistrovat se
@@ -68,16 +71,6 @@
             <v-btn text plain class="text-caption" :ripple="false" :to="{name: 'login'}">
               Již máte účet?
             </v-btn>
-            <v-container>
-              <v-row>
-                <v-col cols="12" md="4">
-                  <v-select label="Typ kontaktu" color="secondary"/>
-                </v-col>
-                <v-col cols="12" md="8">
-                  <v-text-field label="Hodnota" color="secondary"/>
-                </v-col>
-              </v-row>
-            </v-container>
           </v-form>
         </v-card>
       </v-col>
@@ -87,19 +80,21 @@
 
 <script>
 import {validationMixin} from 'vuelidate'
-import {required, minLength, sameAs, maxLength, alphaNum, helpers} from 'vuelidate/lib/validators'
+import {required, minLength, sameAs, maxLength, alphaNum} from 'vuelidate/lib/validators'
+import {uniAlpha} from "../helpers/validators";
+import ContactList from "../components/ContactList";
+import {mapGetters} from "vuex";
 
-// eslint-disable-next-line no-control-regex
-const alpha = helpers.regex("alpha", /^([^\u0000-\u007F]|[A-Za-z])+$/);
+
 
 export default {
   name: "Register",
-
+  components: {ContactList},
   mixins: [validationMixin],
 
   validations: {
-    firstName: {required, minLength: minLength(2), alpha},
-    lastName: {required, minLength: minLength(2), alpha},
+    firstName: {required, minLength: minLength(2), uniAlpha},
+    lastName: {required, minLength: minLength(2), uniAlpha},
     userName: {required, minLength: minLength(6), maxLength: maxLength(50), alphaNum},
     password: {
       required, minLength: minLength(8), maxLength: maxLength(32),
@@ -133,16 +128,17 @@ export default {
   },
 
   methods: {
-
     async doRegister() {
       this.$v.$reset()
       this.resetError()
       try {
+        await this.$refs.regContactList.doSetContacts()
         await this.$http.post("/register", {
           firstName: this.firstName,
           lastName: this.lastName,
           userName: this.userName,
-          password: this.password
+          password: this.password,
+          contacts: this.contacts
         })
       } catch (e) {
         if (e.response.status === 409) {
@@ -164,6 +160,8 @@ export default {
   },
 
   computed: {
+    ...mapGetters('Contacts', ['contacts']),
+
     userNameErrors() {
       const errors = []
       if (!this.$v.userName.$dirty)
@@ -184,7 +182,7 @@ export default {
 
       !this.$v.firstName.required && errors.push('*Povinné pole')
       !this.$v.firstName.minLength && errors.push('Minimálně 2 znaky')
-      !this.$v.firstName.alpha && errors.push('Jméno neobsahuje čísla ani speciální znaky')
+      !this.$v.firstName.uniAlpha && errors.push('Jméno neobsahuje čísla ani speciální znaky')
 
       return errors
     },
@@ -196,7 +194,7 @@ export default {
 
       !this.$v.lastName.required && errors.push('*Povinné pole')
       !this.$v.lastName.minLength && errors.push('Minimálně 2 znaky')
-      !this.$v.lastName.alpha && errors.push('Příjmení neobsahuje čísla ani speciální znaky')
+      !this.$v.lastName.uniAlpha && errors.push('Příjmení neobsahuje čísla ani speciální znaky')
 
       return errors
     },
