@@ -2,7 +2,7 @@
   <v-container fluid>
     <template v-for="(contact, index) in contacts">
       <v-row :key="index" class="mt-md-n6 my-n4" justify="space-between">
-        <v-col cols=12 md="5">
+        <v-col cols="12" md="5">
           <v-select v-model="contacts[index].contactType" label="Typ kontaktu" :items="contactTypes"
                     prepend-icon="mdi-close"
                     @click:prepend="deleteContact(index)"/>

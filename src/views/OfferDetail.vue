@@ -50,6 +50,28 @@
               </v-card-subtitle>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col cols="12" md="5">
+              <v-card-title>
+                KONTAKTY
+              </v-card-title>
+            </v-col>
+          </v-row>
+          <template v-for="(contact, index) in contacts">
+            <v-row :key="index" class="mb-n10">
+              <v-col cols="12">
+                <v-card-title class="text-h6 secondary--text font-weight-regular">
+                  {{contacts[index].contactType }}
+                </v-card-title>
+              </v-col>
+              <v-col cols="12">
+                <v-card-subtitle class="text-subtitle-1 mt-n13 ml-2 text-caption">
+                  {{contacts[index].value }}
+                </v-card-subtitle>
+              </v-col>
+            </v-row>
+          </template>
+
         </v-container>
       </v-col>
 
@@ -57,7 +79,7 @@
         <v-container>
           <v-row justify="space-between">
             <v-col cols="12" md="5">
-              <v-card-title class="pl-10 pl-md-0">
+              <v-card-title>
                 RECENZE
               </v-card-title>
             </v-col>
@@ -178,6 +200,9 @@ export default {
     },
     reviews() {
       return this.offerDetail['reviews']
+    },
+    contacts() {
+      return this.offerDetail['contacts']
     }
   },
   data() {
