@@ -20,6 +20,10 @@ Vue.use(VueRouter)
 
 const routes = [
     {
+        path: '/',
+        redirect: '/offers',
+    },
+    {
         path: '/login',
         name: 'login',
         component: Login
