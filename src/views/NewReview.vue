@@ -27,13 +27,13 @@
               :counter="512"
           />
           <v-checkbox v-model="anonymous" label="Přejete si zůstat v anonymitě?"/>
-          <v-alert v-model="isAnonymous"
+          <v-alert v-if="hasServerError"
                    dense
                    outlined
                    type="error"
                    class="my-5"
           >
-            Pokud zvolíte anonymní recenzi, vaši recenzi nebude možné hodnotit.
+            {{ this.error }}
           </v-alert>
           <v-btn block color="primary" type="submit" :disabled="isDisabled">
             <v-icon>mdi-pencil-plus</v-icon>
@@ -71,8 +71,14 @@ export default {
     hasStars() {
       return this.stars !== 0
     },
+    hasLocalError() {
+      return this.verbalEvaluationErrors.length !== 0;
+    },
+    hasServerError() {
+      return this.error !== null
+    },
     isDisabled() {
-      return !(this.hasStars && this.verbalEvaluationErrors.length === 0)
+      return !this.hasStars && !this.hasLocalError && !this.hasServerError
     },
     isAnonymous() {
       return this.anonymous
@@ -82,7 +88,8 @@ export default {
     return {
       stars: 0,
       verbalEvaluation: "",
-      anonymous: false
+      anonymous: false,
+      error: null
     }
   },
   methods: {
@@ -95,9 +102,13 @@ export default {
           offerId: this.$route.params.offerId
         })
       } catch (e) {
-        this.error = e.response.data.error
+        if (e.response.status === 403) {
+          this.error = e.response.data.message
+        } else {
+          this.error = "Nastala chyba"
+        }
       } finally {
-        if (this.error === null) {
+        if (!this.hasServerError) {
           await this.$router.push({name: 'offerDetail', params: {offerId: this.$route.params.offerId}})
         }
       }

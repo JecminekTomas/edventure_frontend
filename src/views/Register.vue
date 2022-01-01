@@ -144,7 +144,7 @@ export default {
         if (e.response.status === 409) {
           this.error = "Uživatelské jméno je již používané"
         } else {
-          this.error = e.response.data.error
+          this.error = "Nastala chyba"
         }
       } finally {
         if (this.error === null) {

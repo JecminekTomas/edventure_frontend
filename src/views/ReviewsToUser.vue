@@ -5,7 +5,7 @@
     </v-row>
     <v-row v-else justify="center">
       <v-col cols="12" md="8">
-        <v-list>
+        <v-list v-if="hasReviews">
           <v-list-item
               v-for="review in reviews"
               :key="review['id']">
@@ -74,6 +74,14 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
+        <v-container v-else>
+          <v-row>
+            <v-col cols="12" class="text-center">
+              <img src="../assets/states/no_data.svg" width="50%" alt="No review" class="mb-5">
+              <div class="text-h6">Dosud vás nikdo neohodnotil.</div>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-col>
     </v-row>
   </v-container>
@@ -85,7 +93,10 @@ import {mapActions, mapState} from 'vuex';
 export default {
   name: "ReviewsToUser",
   computed: {
-    ...mapState('Reviews', ['reviews', 'didLoadReviews'])
+    ...mapState('Reviews', ['reviews', 'didLoadReviews']),
+    hasReviews() {
+      return this.reviews.length !== 0
+    }
   },
   async created() {
     await this.fetchReviewsTo(this.$tokenManager.getUserId())

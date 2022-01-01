@@ -1,6 +1,6 @@
 const state = {
-
     didLoadOffers: false,
+    hasSearched: false,
 
     offer: null,
     offers: [],
@@ -21,6 +21,8 @@ const state = {
 }
 
 const getters = {
+
+    hasSearched: state => state.hasSearched,
 
     offer: state => state.offer,
 
@@ -97,6 +99,7 @@ const actions = {
 
     async fetchOffersBySubject({commit}, subjectId) {
         commit('startedDataDownload')
+        commit('setSearched')
         const response = await this._vm.$http.get('/offers', {params: {subjectId: subjectId}});
         commit('setOffers', response.data);
         commit('finishedDataDownload');
@@ -146,13 +149,18 @@ const actions = {
     setOffer({commit}, offer) {
         commit('setOffer', offer)
     },
-    // TODO: Rest of them
+
+    setSearched({commit}) {
+        commit('setSearched')
+    }
+
 }
 
 const mutations = {
     setOffers: (state, offers) => (state.offers = offers),
 
     setOffer: (state, offer) => (state.offer = offer),
+    setSearched: (state) => (state.hasSearched = true),
 
     startedDataDownload: state => state.didLoadOffers = false,
     finishedDataDownload: state => state.didLoadOffers = true,

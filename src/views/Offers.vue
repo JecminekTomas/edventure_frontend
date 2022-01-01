@@ -11,8 +11,8 @@
       </v-fade-transition>
       <v-col>
         <v-container>
-          <search-bar/>
-          <v-row>
+          <search-bar ref="search"/>
+          <v-row v-if="hasOffers">
             <template v-for="offer in filteredOffers">
               <v-col cols="12" md="6" :key="offer.id">
                 <v-hover v-slot="{ hover }">
@@ -63,6 +63,7 @@
                       <v-overlay
                           v-if="hover"
                           absolute
+                          z-index="0"
                           color="ternary">
                         <v-btn color="quaternary" :to="{ name: 'offerDetail', params: { offerId: offer.id }}">
                           Více informací
@@ -73,6 +74,25 @@
                 </v-hover>
               </v-col>
             </template>
+          </v-row>
+          <v-container v-else>
+            <v-row>
+              <v-col cols="12" class="text-center">
+                <img src="../assets/states/no_data_3.svg" width="50%" alt="No review" class="mb-5">
+                <div class="text-h6">Žádná dostupná nabídka.</div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-container>
+      </v-col>
+    </v-row>
+    <v-row v-if="!this.hasSearched">
+      <v-col>
+        <v-container>
+          <v-row>
+            <v-col>
+              <a class="text-h4 text--accent-4" @click="scrollToSearch">Pro zobrazení více nabídek specifikujte předmět…</a>
+            </v-col>
           </v-row>
         </v-container>
       </v-col>
@@ -90,14 +110,21 @@ export default {
   components: {SearchBar, FilterDrawer},
   methods: {
     ...mapActions('Offers', ['fetchOffers', 'fetchOffersBySubject']),
+    scrollToSearch() {
+      window.scrollTo({ top: 0, behavior: 'smooth'});
+    }
   },
   computed: {
-    ...mapState('Offers', ['offers', 'didLoadOffers', 'showFilter']),
+    ...mapState('Offers', ['offers', 'didLoadOffers', 'showFilter', 'hasSearched']),
     ...mapGetters('Offers', ['getOffers']),
     ...mapGetters('Subjects', ['subject']),
 
     filteredOffers() {
       return this.getOffers
+    },
+
+    hasOffers() {
+      return this.offers.length !== 0
     }
   },
   filters: {

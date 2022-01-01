@@ -2,9 +2,7 @@
   <v-container fill-height fluid>
     <v-row align="center" justify="center" class="mx-sm-10">
     <div>
-      <div class="text-h2">404</div>
-      <br/>
-      <div class="text-h2">stránka nenalezena</div>
+      <img src="../assets/states/not_found.svg" width="100%" alt="Not found">
     </div>
   </v-row>
   </v-container>

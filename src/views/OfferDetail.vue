@@ -61,17 +61,16 @@
             <v-row :key="index" class="mb-n10">
               <v-col cols="12">
                 <v-card-title class="text-h6 secondary--text font-weight-regular">
-                  {{contacts[index].contactType }}
+                  {{ contacts[index].contactType }}
                 </v-card-title>
               </v-col>
               <v-col cols="12">
                 <v-card-subtitle class="text-subtitle-1 mt-n13 ml-2 text-caption">
-                  {{contacts[index].value }}
+                  {{ contacts[index].value }}
                 </v-card-subtitle>
               </v-col>
             </v-row>
           </template>
-
         </v-container>
       </v-col>
 
@@ -93,15 +92,14 @@
               </v-card-title>
             </v-col>
           </v-row>
-          <v-list>
+          <v-list v-if="reviews.length !== 0">
             <v-list-item
                 v-for="review in reviews"
                 :key="review['id']">
               <v-list-item-content>
                 <v-container>
                   <v-card class="pb-4"
-                          elevation="4"
-                  >
+                          elevation="4">
                     <v-container>
                       <v-row justify="start" justify-md="space-between">
                         <v-col cols="12">
@@ -170,6 +168,14 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
+          <v-container v-else>
+            <v-row>
+              <v-col cols="12" class="text-center">
+                <img src="../assets/states/no_review.svg" width="80%" alt="No review" class="mb-5">
+                <div class="text-h6">Zatím nebyla přidána žádná recenze.</div>
+              </v-col>
+            </v-row>
+          </v-container>
         </v-container>
       </v-col>
     </v-row>
@@ -203,10 +209,7 @@ export default {
     },
     contacts() {
       return this.offerDetail['contacts']
-    }
-  },
-  data() {
-    return {}
+    },
   },
   async created() {
     await this.fetchOffer(this.$route.params.offerId)
